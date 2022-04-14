@@ -1,0 +1,17 @@
+[MASTER]
+init-hook="from pylint.config import find_pylintrc; import os, sys; sys.path.append(os.path.dirname(find_pylintrc()))"
+
+[MESSAGES CONTROL]
+disable=missing-module-docstring,
+    missing-class-docstring,
+    missing-function-docstring,
+    import-outside-toplevel,
+    import-self,
+    redefined-outer-name,
+    unused-import,
+
+[FORMAT]
+max-line-length=140
+max-args=15
+max-attributes=11
+max-branches=17
