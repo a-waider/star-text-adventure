@@ -17,7 +17,7 @@ def test_unlock_front_door():
     ])
     assert Rooms.FRONT_YARD.value.locked is False
     execute_commands(commands=[
-        "go garden"
+        "go front yard"
     ])
     assert CHARACTER.room == Rooms.FRONT_YARD.value
 
@@ -59,6 +59,15 @@ def test_use_armor():
         "use armor"
     ])
     assert CHARACTER.armor == 5
+
+
+def test_buy_item():
+    CHARACTER.room = Rooms.GARAGE.value
+    CHARACTER.add_to_inventory(Items.COIN.value, 100)
+    execute_commands(commands=[
+        "buy armor"
+    ])
+    assert Items.ARMOR.value in CHARACTER.inventory
 
 
 def test_fight():

@@ -4,8 +4,9 @@ from classes.command import Command
 from classes.item import Item, Map, Weapon, WeaponMelee, WeaponRanged
 from classes.npc import NPC
 from classes.room import Room
-
 from utilities import trailing_s
+
+from world.rooms import Rooms, room_connections
 
 # pylint: disable=unused-argument
 
@@ -50,6 +51,22 @@ def show_health(args: 'list[str]'):
     print(f"----- {trailing_s(CHARACTER)} Health -----")
     print(CHARACTER.fighting_stats())
     print("-----")
+
+
+def buy(args: 'list[str]'):
+    from main import CHARACTER
+    from world.items import Items
+
+    item = Items.get_item_by_name(" ".join(args))
+    if item in CHARACTER.room.items_to_buy:
+        if CHARACTER.inventory[Items.COIN.value] > CHARACTER.room.items_to_buy[item]:
+            CHARACTER.remove_from_inventory(
+                Items.COIN.value, CHARACTER.room.items_to_buy[item])
+            CHARACTER.add_to_inventory(item, CHARACTER.room.items_to_buy[item])
+        else:
+            print("You don't have enough coins in your inventory")
+    else:
+        print("This item can't be bought")
 
 
 def take(args: 'list[str]'):
@@ -121,8 +138,6 @@ def go(args: 'list[str]'):
     # pylint: disable=invalid-name
     from main import CHARACTER
 
-    from world.rooms import Rooms, room_connections
-
     current_room: Room = CHARACTER.room
     next_room: Room = Rooms.get_room_by_name(" ".join(args))
     for room_connection in room_connections:
@@ -188,6 +203,7 @@ def inspect(args: 'list[str]'):
 
 def attack(args: 'list[str]'):
     from main import CHARACTER
+
     from world.commands import create_savepoint
     from world.rooms import respawn_rooms
 
@@ -247,8 +263,6 @@ def attack(args: 'list[str]'):
 def create_savepoint(args: 'list[str]'):
     from main import CHARACTER
 
-    from world.rooms import Rooms
-
     filename = args[0] if args[0] else "savepoint.json"
     json_output = {
         "character": CHARACTER.to_json(),
@@ -263,7 +277,6 @@ def import_savepoint(args: 'list[str]'):
     from main import CHARACTER
 
     from world.items import Items
-    from world.rooms import Rooms
 
     filename = args[0] if args[0] else "savepoint.json"
     try:
@@ -354,6 +367,13 @@ commands: 'list[Command]' = [
             aliases=["search", "look"],
             description="Searches the room for loot",
             command=search_room),
+    Command("buy",
+            args=["item"],
+            description="Buys an item",
+            valid_rooms=[
+                Rooms.GARAGE.value,
+            ],
+            command=buy),
     Command("take",
             args=["item"],
             description="Takes an item into the inventory",

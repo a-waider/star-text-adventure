@@ -79,6 +79,9 @@ class Rooms(Enum):
         loot={
             Items.BOW.value: 1,
             Items.COIN.value: 10,
+        },
+        items_to_buy={
+            Items.ARMOR.value: 10,
         })
     GRAVESTONE: Room = Room(
         "Gravestone",

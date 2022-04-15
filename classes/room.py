@@ -9,19 +9,22 @@ class Room:
     def __init__(self,
                  name: str,
                  npc: NPC = None,
-                 loot: 'dict[Item]' = None,
+                 loot: 'dict[Item,int]' = None,
                  visited: bool = False,
                  locked: bool = False,
                  lock_message: str = None,
-                 enter_room_function=lambda: None):
+                 enter_room_function=lambda: None,
+                 items_to_buy: 'dict[Item,int]' = None):
         self.name = name
         self.connected_rooms = list()
         self.npc: NPC = npc
-        self.loot: 'dict[Item]' = loot if loot is not None else dict()
+        self.loot: 'dict[Item,int]' = loot if loot is not None else dict()
         self.visited: bool = visited
         self.enter_room_function = enter_room_function
         self.locked: bool = locked
         self.lock_message: str = lock_message
+        self.items_to_buy: 'dict[Item,int]' = items_to_buy if items_to_buy is not None else dict(
+        )
 
     def __str__(self) -> str:
         return colored(self.name, "blue")
@@ -41,7 +44,7 @@ class Room:
         }
 
     def enter_room(self):
-        if self.lock_message:
+        if self.locked and self.lock_message:
             text_print(f"{self.lock_message}\n")
             return
         if self.npc:
@@ -52,6 +55,14 @@ class Room:
         if self.enter_room_function:
             self.enter_room_function()
         text_print(f"You are now in {self}.\n")
+        if self.items_to_buy:
+            print(self.buy_menu())
+
+    def buy_menu(self) -> str:
+        ret = f"""----- {self} shop -----\n{'Item':15}{'Price':10}"""
+        for item, price in self.items_to_buy.items():
+            ret += f"\n{str(item):15}{price:10}"
+        return ret + "\n-----"
 
     def get_connected_rooms(self) -> 'list[Room]':
         from world.rooms import room_connections
