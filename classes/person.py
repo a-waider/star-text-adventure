@@ -1,6 +1,6 @@
 import random
 
-from exceptions import NotEnoughInInventory, NotInInventory
+from exceptions import NotEnoughInInventory, NotInInventory, NotEnoughInventorySpace
 from termcolor import colored
 from utilities import colored_health
 from world.items import Items
@@ -22,6 +22,7 @@ class Person:
             melee_weapon: WeaponMelee = Items.FIST.value,
             ranged_weapon: WeaponRanged = None,
             inventory: 'Inventory[Item,int]' = None,
+            max_inventory_items: int = 10,
             intelligence: int = 100,
             room: Room = Rooms.BEDROOM,
             kills: int = 0,
@@ -35,6 +36,7 @@ class Person:
         self.ranged_weapon: WeaponRanged = ranged_weapon
         self.inventory: 'Inventory[Item,int]' = inventory if inventory is not None else Inventory(
         )
+        self.max_inventory_items: int = max_inventory_items
         self.intelligence: int = intelligence
         self.room: Room = room
         self.kills: int = kills
@@ -60,6 +62,7 @@ class Person:
             "melee_weapon": self.melee_weapon.to_json() if self.melee_weapon else None,
             "ranged_weapon": self.ranged_weapon.to_json() if self.ranged_weapon else None,
             "inventory": self.inventory.to_json(),
+            "max_inventory_items": self.max_inventory_items,
             "intelligence": self.intelligence,
             "room": self.room.name,
             "kills": self.kills,
@@ -80,6 +83,7 @@ class Person:
         CHARACTER.ranged_weapon = WeaponRanged.from_json(
             json_object["ranged_weapon"])
         CHARACTER.inventory = Inventory.from_json(json_object["inventory"])
+        CHARACTER.max_inventory_items = json_object["max_inventory_items"]
         CHARACTER.intelligence = json_object["intelligence"] if json_object["intelligence"] else 0
         CHARACTER.room = Rooms.get_room_by_name(json_object["room"])
         CHARACTER.kills = json_object["kills"] if json_object["kills"] else 0
@@ -98,11 +102,15 @@ class Person:
         else:
             self.health = max(self.health - int(damage / self.armor * 10), 0)
 
-    def add_to_inventory(self, item: Item, amount: int = 1):
+    def add_to_inventory(self, item: Item, amount: int = 1, force=False):
         if item in self.inventory:
             self.inventory[item] += amount
         else:
-            self.inventory[item] = amount
+            if len(self.inventory) < self.max_inventory_items or force:
+                self.inventory[item] = amount
+            else:
+                print(
+                    f"Couldn't add this to your inventory. The maximum capacity of {self.max_inventory_items} is reached.")
 
     def remove_from_inventory(self, item: Item, amount: int = 1):
         if item in self.inventory:
