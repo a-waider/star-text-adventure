@@ -7,5 +7,5 @@ class Inventory(dict):
         from world.items import Items
 
         if json_object:
-            return {Items.get_item_by_name(item): amount for item, amount in json_object.items()}
-        return dict()
+            return Inventory({Items.get_item_by_name(item): amount for item, amount in json_object.items()})
+        return Inventory()
