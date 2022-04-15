@@ -2,6 +2,8 @@ from exceptions import CommandFunctionNotDefined
 
 from classes.room import Room
 
+ALL_ROOMS = "ANY"
+
 
 class Command:
     def __init__(self,
@@ -10,7 +12,7 @@ class Command:
                  aliases: 'list[str]' = None,
                  attributes: 'list[str]' = None,
                  description: str = None,
-                 valid_rooms: 'list[Room]' = "ANY",
+                 valid_rooms: 'list[Room]' = ALL_ROOMS,
                  available_in_fight: bool = False,
                  command=lambda: None):
         self.keyword: str = keyword
@@ -27,7 +29,7 @@ class Command:
         return self.keyword
 
     def run_command(self, current_room: Room = None, args: 'list[str]' = None):
-        if self.valid_rooms == "ANY" or current_room in self.valid_rooms:
+        if self.valid_rooms == ALL_ROOMS or current_room in self.valid_rooms:
             if self.command:
                 self.command(args)
             else:
