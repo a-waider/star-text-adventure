@@ -1,5 +1,7 @@
 import random
 
+from exceptions import NotEnoughInInventory, NotInInventory
+from termcolor import colored
 from world.items import Items
 from world.rooms import Rooms
 
@@ -37,6 +39,18 @@ class Person:
     def __str__(self) -> str:
         return self.name
 
+    def fighting_stats(self, ammunition: bool = False) -> str:
+        if self.health < 30:
+            health_color = "yellow"
+        elif self.health < 10:
+            health_color = "red"
+        else:
+            health_color = "green"
+        ret = f"Health: {colored(self.health, health_color)}\nArmor: {colored(self.armor, 'blue')}"
+        if ammunition:
+            ret += f"Ammunition: {self.ranged_weapon.ammunition}"
+        return ret
+
     def to_json(self) -> dict:
         inventory_dict = {}
         for item, amount in self.inventory:
@@ -68,3 +82,20 @@ class Person:
             self.health -= damage
         else:
             self.health = max(self.health - int(damage / self.armor * 10), 0)
+
+    def add_to_inventory(self, item: Item, amount: int = 1):
+        if item in self.inventory:
+            self.inventory[item] += amount
+        else:
+            self.inventory[item] = amount
+
+    def remove_from_inventory(self, item: Item, amount: int = 1):
+        if item in self.inventory:
+            if amount > self.inventory[item]:
+                self.inventory[item] -= amount
+            elif amount == self.inventory[item]:
+                self.inventory.pop(item, None)
+            else:
+                raise NotEnoughInInventory
+        else:
+            raise NotInInventory

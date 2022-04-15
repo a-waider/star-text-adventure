@@ -9,27 +9,27 @@ def execute_commands(commands: 'list[str]'):
 
 
 def test_unlock_front_door():
-    Rooms.GARDEN.value.locked = True
+    Rooms.FRONT_YARD.value.locked = True
     CHARACTER.room = Rooms.CORRIDOR.value
     CHARACTER.inventory[Items.KEY_HOME.value] = 1
     execute_commands(commands=[
         "use key front door"
     ])
-    assert Rooms.GARDEN.value.locked is False
+    assert Rooms.FRONT_YARD.value.locked is False
     execute_commands(commands=[
         "go garden"
     ])
-    assert CHARACTER.room == Rooms.GARDEN.value
+    assert CHARACTER.room == Rooms.FRONT_YARD.value
 
 
 def test_cant_go_to_locked_room():
-    Rooms.GARDEN.value.locked = True
+    Rooms.FRONT_YARD.value.locked = True
     CHARACTER.room = Rooms.CORRIDOR.value
     execute_commands(commands=[
         "go garden"
     ])
     assert CHARACTER.room == Rooms.CORRIDOR.value
-    assert Rooms.GARDEN.value.locked is True
+    assert Rooms.FRONT_YARD.value.locked is True
 
 
 def test_equip_melee_weapon():
@@ -67,4 +67,11 @@ def test_savepoints():
     execute_commands(commands=[
         "import savepoint",
         "create savepoint",
+    ])
+
+
+def test_view_map():
+    CHARACTER.add_to_inventory(Items.MAP_HOME.value)
+    execute_commands(commands=[
+        "view home map"
     ])

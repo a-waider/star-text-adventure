@@ -1,7 +1,7 @@
 import json
 
 from classes.command import Command
-from classes.item import Item, Weapon, WeaponMelee, WeaponRanged
+from classes.item import Item, Map, Weapon, WeaponMelee, WeaponRanged
 from classes.npc import NPC
 from classes.room import Room
 
@@ -11,10 +11,10 @@ from classes.room import Room
 def help_menu(args: 'list[str]'):
     print("----- Help -----")
     print(
-        f"{'Command':20}{'Arguments':19}: {'Description':60}{'Aliases':20}")
+        f"{'Command':20}{'Arguments':19}: {'Description':70}{'Aliases':20}")
     for command in commands:
         print(
-            f"{command.keyword:20}{', '.join(command.args):19}: {command.description:60}{', '.join(command.aliases):20}")
+            f"{command.keyword:20}{', '.join(command.args):19}: {command.description:70}{', '.join(command.aliases):20}")
     print("-----")
 
 
@@ -30,9 +30,13 @@ def show_statistics(args: 'list[str]'):
 def show_inventory(args: 'list[str]'):
     from main import CHARACTER
 
-    print("----- Inventory -----")
+    if str(CHARACTER).endswith("s"):
+        print(f"----- {CHARACTER}' Inventory -----")
+    else:
+        print(f"----- {CHARACTER}'s Inventory -----")
     print(f"Melee weapon: {CHARACTER.melee_weapon}")
-    print(f"Ranged weapon: {CHARACTER.ranged_weapon}")
+    if CHARACTER.ranged_weapon:
+        print(f"Ranged weapon: {CHARACTER.ranged_weapon}")
     for item, amount in CHARACTER.inventory.items():
         if amount > 1:
             print(f"{amount} {item.plural}")
@@ -44,7 +48,9 @@ def show_inventory(args: 'list[str]'):
 def show_health(args: 'list[str]'):
     from main import CHARACTER
 
-    print(f"Health: {CHARACTER.health}")
+    print(f"----- {CHARACTER} -----")
+    print(CHARACTER.fighting_stats)
+    print("-----")
 
 
 def take(args: 'list[str]'):
@@ -57,10 +63,7 @@ def take(args: 'list[str]'):
     amount = CHARACTER.room.loot[item]
     if item:
         CHARACTER.room.loot.pop(item, None)
-        if item in CHARACTER.inventory:
-            CHARACTER.inventory[item] += amount
-        else:
-            CHARACTER.inventory[item] = amount
+        CHARACTER.add_to_inventory(item, amount)
     else:
         print("This item does not exist")
 
@@ -87,6 +90,19 @@ def use(args: 'list[str]'):
         item.use()
     else:
         print("You don't have this item in your inventory")
+
+
+def view(args: 'list[str]'):
+    from main import CHARACTER
+
+    from world.items import Items
+
+    map_name = " ".join(args)
+    map_object = Map.get_map_by_name(map_name)
+    if map_object in CHARACTER.inventory.keys():
+        map_object.view()
+    else:
+        print("You don't have this map in your inventory")
 
 
 def where_am_i(args: 'list[str]'):
@@ -142,9 +158,33 @@ def equip(args: 'list[str]'):
                 else:
                     CHARACTER.inventory[CHARACTER.ranged_weapon] = 1
             CHARACTER.ranged_weapon = weapon
-        CHARACTER.inventory.pop(weapon, None)
+        CHARACTER.remove_from_inventory(weapon)
     print(
         f"You have now {weapon} equipped. Your previous equipped weapon is in your inventory.")
+
+
+def inspect(args: 'list[str]'):
+    from main import CHARACTER
+
+    weapon = Weapon.get_weapon_by_name(" ".join(args))
+    weapons = []
+    if CHARACTER.melee_weapon:
+        weapons.append(CHARACTER.melee_weapon)
+    if CHARACTER.ranged_weapon:
+        weapons.append(CHARACTER.ranged_weapon)
+    for item in CHARACTER.inventory:
+        if isinstance(item, Weapon):
+            weapons.append(item)
+
+    if weapon in weapons:
+        print(f"----- {weapon} -----")
+        print(f"Base damage: {weapon.base_damage}")
+        print(f"Damage variation: {weapon.damage_variation}")
+        if isinstance(weapon, WeaponRanged):
+            print(f"Ammunition: {weapon.ammunition}")
+        print("-----")
+    else:
+        print("You don't have this weapon equipped or in your inventory")
 
 
 def attack(args: 'list[str]'):
@@ -176,10 +216,7 @@ def attack(args: 'list[str]'):
         if npc.health <= 0:
             print(f"You defeated {npc}")
             print(f"----- {CHARACTER} ----")
-            print(f"Health: {CHARACTER.health}")
-            print(f"Armor: {CHARACTER.armor}")
-            if args[0] == "ranged":
-                print(f"Ammunition: {CHARACTER.ranged_weapon.ammunition}")
+            print(CHARACTER.fighting_stats())
             print("-----")
             for item, amount in npc.loot.items():
                 if item in CHARACTER.inventory:
@@ -198,14 +235,10 @@ def attack(args: 'list[str]'):
                 f"You have been killed by {npc} and respawn in {CHARACTER.room}")
             create_savepoint([""])
         else:
-            print("----- NPC -----")
-            print(f"Health: {npc.health}")
-            print(f"Armor: {npc.armor}")
+            print(f"----- {npc} -----")
+            print(npc.fighting_stats())
             print(f"----- {CHARACTER} ----")
-            print(f"Health: {CHARACTER.health}")
-            print(f"Armor: {CHARACTER.armor}")
-            if args[0] == "ranged":
-                print(f"Ammunition: {CHARACTER.ranged_weapon.ammunition}")
+            print(CHARACTER.fighting_stats())
             print("-----")
     else:
         print("There are no npc's to fight.")
@@ -313,6 +346,10 @@ commands: 'list[Command]' = [
     Command("where can i go",
             description="Shows the rooms you can enter from your current position",
             command=where_can_i_go),
+    Command("go",
+            args=["room"],
+            description="Move your character to another room",
+            command=go),
     Command("search room",
             aliases=["search", "look"],
             description="Searches the room for loot",
@@ -325,15 +362,20 @@ commands: 'list[Command]' = [
             args=["item"],
             description="Uses an item from your inventory",
             command=use),
-    Command("go",
-            args=["room"],
-            description="Move your character to another room",
-            command=go),
+    Command("view",
+            args=["map name"],
+            description="Displays the map",
+            command=view),
     Command("equip",
             args=["weapon name"],
             description="Equips a weapon",
             available_in_fight=True,
             command=equip),
+    Command("inspect",
+            args=["weapon name"],
+            description="Shows the specs of a equipped weapon or a weapon in your inventory",
+            available_in_fight=True,
+            command=inspect),
     Command("attack",
             args=["weapon type"],
             description="Attacks an enemy. Valid types are \"melee\" or \"ranged\"",

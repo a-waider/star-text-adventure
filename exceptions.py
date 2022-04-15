@@ -4,3 +4,11 @@ class UseFunctionNotDefined(Exception):
 
 class CommandFunctionNotDefined(Exception):
     pass
+
+
+class NotInInventory(Exception):
+    pass
+
+
+class NotEnoughInInventory(Exception):
+    pass

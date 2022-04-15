@@ -23,7 +23,7 @@ class NPC:
         self.loot = loot if loot is not None else dict()
 
     def __str__(self):
-        return self.name
+        return colored(self.name, color="red")
 
     def to_json(self):
         from world.items import Items
@@ -58,3 +58,13 @@ class NPC:
             Armor:   {self.armor}
             Coin(s): {colored(self, 'yellow')}
             """)
+
+    def fighting_stats(self) -> str:
+        if self.health < 30:
+            health_color = "yellow"
+        elif self.health < 10:
+            health_color = "red"
+        else:
+            health_color = "green"
+        ret = f"Health: {colored(self.health, health_color)}\nArmor: {colored(self.armor, 'blue')}"
+        return ret

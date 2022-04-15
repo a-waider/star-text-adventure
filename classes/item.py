@@ -1,16 +1,22 @@
 import random
 
 from exceptions import UseFunctionNotDefined
+from termcolor import colored
 
 
 class Item:
-    def __init__(self, name: str, plural: str = "", use_function=lambda: None):
+    def __init__(self, name: str, plural: str = "", icon: str = "", use_function=lambda: None):
         self.name: str = name
         self.plural: str = plural
+        self.icon: str = icon
         self.use_function = use_function
 
     def __str__(self):
-        return self.name
+        ret = ""
+        if self.icon:
+            ret += f"{self.icon} "
+        ret += colored(self.name, "yellow")
+        return ret
 
     def use(self):
         from main import CHARACTER
@@ -22,14 +28,40 @@ class Item:
             raise UseFunctionNotDefined
 
 
+class Map(Item):
+    def __init__(
+            self,
+            name: str,
+            plural: str = "",
+            icon: str = "",
+            view_function=lambda: None):
+        super().__init__(name, plural, icon)
+        self.view_function = view_function
+
+    def view(self):
+        self.view_function()
+
+    @staticmethod
+    def get_map_by_name(name: str):
+        from world.items import Items
+
+        maps: 'list[Map]' = [
+            item.value for item in Items if isinstance(item.value, Map)]
+        for requested_map in maps:
+            if requested_map.name.lower() == name.lower():
+                return requested_map
+        return None
+
+
 class Weapon(Item):
     def __init__(
             self,
             name: str,
             plural: str = "",
+            icon: str = "",
             base_damage: int = 0,
             damage_variation: float = 0):
-        super().__init__(name, plural)
+        super().__init__(name, plural, icon)
         self.base_damage: int = base_damage
         self.damage_variation: float = damage_variation
 
@@ -66,10 +98,11 @@ class WeaponRanged(Weapon):
     def __init__(self,
                  name: str,
                  plural: str = "",
+                 icon: str = "",
                  base_damage: int = 0,
                  damage_variation: float = 0,
                  ammunition: int = 0):
-        super().__init__(name, plural, base_damage, damage_variation)
+        super().__init__(name, plural, icon, base_damage, damage_variation)
         self.ammunition: int = ammunition
 
     def to_json(self) -> dict:

@@ -10,13 +10,15 @@ CHARACTER.melee_weapon = Items.FIST.value
 CHARACTER.ranged_weapon = None
 
 
-CHARACTER.room = Rooms.LOUNGE.value
-
-
 def main(test_mode: bool = False, user_commands: 'list[str]' = None):
-    # input("Please enter your character's name: ").strip()
     from main import CHARACTER
-    CHARACTER.name = "Andy"
+
+    if not test_mode:
+        CHARACTER.name = input(
+            "To beginn, please enter your character's name: ").strip()
+        if CHARACTER.room == Rooms.BEDROOM.value:  # Beginning of story telling
+            print("You wake up in your bed from a nightmare. Everything is still so fuzzy so you can't really see your surroundings. ")
+            print("To get an overview over the available commands type: \"help\"")
 
     while True:
         if test_mode:
