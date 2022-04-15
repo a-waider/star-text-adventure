@@ -127,7 +127,7 @@ class Items(Enum):
 
     @ staticmethod
     def dict_to_json(items: 'dict[Item]'):
-        ret = dict()  # pylint: disable=duplicate-code
+        ret = dict()
         for item, amount in items.items():
             ret[item.name] = amount
         return ret

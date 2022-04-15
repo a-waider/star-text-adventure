@@ -41,8 +41,6 @@ class Room:
     def to_json(self) -> dict:
         from world.items import Items
 
-        # pylint: disable=duplicate-code
-
         return {
             "name": self.name,
             "npc": self.npc.to_json() if self.npc else None,
