@@ -1,3 +1,4 @@
+from termcolor import colored
 from utilities import text_print
 
 from classes.item import Item
@@ -23,7 +24,7 @@ class Room:
         self.lock_message: str = lock_message
 
     def __str__(self) -> str:
-        return self.name
+        return colored(self.name, "blue")
 
     def to_json(self) -> dict:
         from world.items import Items
@@ -42,16 +43,15 @@ class Room:
     def enter_room(self):
         if self.lock_message:
             text_print(f"{self.lock_message}\n")
-            return False
+            return
         if self.npc:
-            print("----- NPC -----")
-            print(f"Health: {self.npc.health}")
-            print(f"Armor: {self.npc.armor}")
+            print(f"----- {self.npc} -----")
+            print(self.npc.fighting_stats())
             print("-----")
+            return
         if self.enter_room_function:
             self.enter_room_function()
-        text_print(f"You are in {self}.\n")
-        return True
+        text_print(f"You are now in {self}.\n")
 
     def get_connected_rooms(self) -> 'list[Room]':
         from world.rooms import room_connections

@@ -1,7 +1,8 @@
 from enum import Enum
 
 from classes.item import Item, Map, WeaponMelee, WeaponRanged
-
+from classes.room import Room
+from termcolor import colored
 
 ROOM_NAME_LENGTH = 15
 
@@ -39,17 +40,23 @@ def lockpicker():
 
 
 def map_home():
+    from main import CHARACTER
+
     from world.rooms import Rooms
 
+    def room_string(room: Room) -> str:
+        if CHARACTER.room == room:
+            return colored(room.name.center(ROOM_NAME_LENGTH), "yellow")
+        return room.name.center(ROOM_NAME_LENGTH)
+
     print(f"""
-{"".center(ROOM_NAME_LENGTH)}    {Rooms.BEDROOM.value.name.center(ROOM_NAME_LENGTH)}    {"".center(ROOM_NAME_LENGTH)}    {"".center(ROOM_NAME_LENGTH)}
+{"".center(ROOM_NAME_LENGTH)}    {room_string(Rooms.BEDROOM.value)}    {"".center(ROOM_NAME_LENGTH)}    {"".center(ROOM_NAME_LENGTH)}
 {"".center(ROOM_NAME_LENGTH)}    {"|".center(ROOM_NAME_LENGTH)}    {"".center(ROOM_NAME_LENGTH)}    {"".center(ROOM_NAME_LENGTH)}
 {"".center(ROOM_NAME_LENGTH)}    {"|".center(ROOM_NAME_LENGTH)}    {"".center(ROOM_NAME_LENGTH)}    {"".center(ROOM_NAME_LENGTH)}
-{Rooms.LIVING_ROOM.value.name.center(ROOM_NAME_LENGTH)} -- {Rooms.CORRIDOR.value.name.center(ROOM_NAME_LENGTH)} -- \
-    {Rooms.LOUNGE.value.name.center(ROOM_NAME_LENGTH)} -- {Rooms.KITCHEN.value.name.center(ROOM_NAME_LENGTH)}
+{room_string(Rooms.LIVING_ROOM.value)} -- {room_string(Rooms.CORRIDOR.value)} -- {room_string(Rooms.LOUNGE.value)} -- {room_string(Rooms.KITCHEN.value)}
 {"".center(ROOM_NAME_LENGTH)}    {"|".center(ROOM_NAME_LENGTH)}    {"".center(ROOM_NAME_LENGTH)}    {"".center(ROOM_NAME_LENGTH)}
 {"".center(ROOM_NAME_LENGTH)}    {"|".center(ROOM_NAME_LENGTH)}    {"".center(ROOM_NAME_LENGTH)}    {"".center(ROOM_NAME_LENGTH)}
-{"".center(ROOM_NAME_LENGTH)}    {Rooms.FRONT_YARD.value.name.center(ROOM_NAME_LENGTH)}    {"".center(ROOM_NAME_LENGTH)}    {"".center(ROOM_NAME_LENGTH)}
+{"".center(ROOM_NAME_LENGTH)}    {room_string(Rooms.FRONT_YARD.value)}    {"".center(ROOM_NAME_LENGTH)}    {"".center(ROOM_NAME_LENGTH)}
 """)
 
 
@@ -95,12 +102,17 @@ class Items(Enum):
     KNIFE: WeaponMelee = WeaponMelee(
         name="Knife",
         icon="🔪",
-        base_damage=20,
+        base_damage=15,
+        damage_variation=7)
+    AXE: WeaponMelee = WeaponMelee(
+        name="Axe",
+        icon="🪓",
+        base_damage=25,
         damage_variation=10)
     BOW: WeaponRanged = WeaponRanged(
         name="Bow",
         icon="🏹",
-        base_damage=15,
+        base_damage=12,
         damage_variation=15)
 
     @ staticmethod

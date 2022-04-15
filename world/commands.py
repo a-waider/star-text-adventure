@@ -225,6 +225,7 @@ def attack(args: 'list[str]'):
             if npc.loot:
                 print("New items in your inventory")
             CHARACTER.room.npc = None
+            CHARACTER.room.enter_room()
         elif CHARACTER.health <= 0:
             CHARACTER.deaths += 1
             CHARACTER.health = 100

@@ -62,9 +62,11 @@ class NPC:
     def fighting_stats(self) -> str:
         if self.health < 30:
             health_color = "yellow"
+            heart_icon = "💛"
         elif self.health < 10:
             health_color = "red"
+            heart_icon = "❤"
         else:
             health_color = "green"
-        ret = f"Health: {colored(self.health, health_color)}\nArmor: {colored(self.armor, 'blue')}"
-        return ret
+            heart_icon = "💚"
+        return f"{'Health: ':15}{heart_icon} {colored(self.health, health_color)}\n{'Armor: ':15}🛡  {colored(self.armor, 'blue')}"
