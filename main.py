@@ -28,14 +28,14 @@ def main(test_mode: bool = False, user_commands: 'list[str]' = None):
             else:
                 break
         else:
-            user_input = input("Enter your command: ").strip()
+            user_input = input("Enter your command: ").strip().lower()
         valid_user_input = False
         for command in commands:
             if user_input.startswith(command.keyword) or [alias for alias in command.aliases if user_input.startswith(alias)]:
                 valid_user_input = True
                 if not bool(CHARACTER.room.npc) or command.available_in_fight:
                     args = user_input.replace(
-                        command.keyword, "", 1).strip().split(" ")
+                        command.keyword, "", 1).strip().lower().split(" ")
                     command.run_command(current_room=CHARACTER.room, args=args)
                 else:
                     print("This command is disabled during fights")
