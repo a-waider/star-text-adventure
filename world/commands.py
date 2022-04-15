@@ -3,6 +3,7 @@ import json
 from classes.command import Command
 from classes.item import Item, Map, Weapon, WeaponMelee, WeaponRanged
 from classes.npc import NPC
+from classes.person import Person
 from classes.room import Room
 from utilities import trailing_s
 
@@ -55,6 +56,7 @@ def show_health(args: 'list[str]'):
 
 def buy(args: 'list[str]'):
     from main import CHARACTER
+
     from world.items import Items
 
     item = Items.get_item_by_name(" ".join(args))
@@ -288,50 +290,14 @@ def import_savepoint(args: 'list[str]' = None):
     try:
         with open(filename) as file:
             json_import = json.loads(file.read())
+
             # Character
-            json_character = json_import["character"]
-            melee_weapon: WeaponMelee = Items.get_item_by_name(
-                json_character["melee_weapon"]["name"]) if json_character["melee_weapon"] else None
-            if json_character["melee_weapon"]:
-                melee_weapon.base_damage = json_character["melee_weapon"]["base_damage"]
-                melee_weapon.damage_variation = json_character["melee_weapon"]["damage_variation"]
-            ranged_weapon: WeaponRanged = Items.get_item_by_name(
-                json_character["ranged_weapon"]["name"]) if json_character["ranged_weapon"] else None
-            if json_character["ranged_weapon"]:
-                ranged_weapon.base_damage = json_character["ranged_weapon"]["base_damage"]
-                ranged_weapon.damage_variation = json_character["ranged_weapon"]["damage_variation"]
-                ranged_weapon.ammunition = json_character["ranged_weapon"]["ammunition"]
-            CHARACTER.name = json_character["name"]
-            CHARACTER.health = json_character["health"] if json_character["health"] else 100
-            CHARACTER.luck = json_character["luck"] if json_character["luck"] else 0
-            CHARACTER.armor = json_character["armor"] if json_character["armor"] else 0
-            CHARACTER.melee_weapon = melee_weapon
-            CHARACTER.ranged_weapon = ranged_weapon
-            CHARACTER.inventory = {Items.get_item_by_name(
-                item_name): amount for item_name, amount in json_character["inventory"].items()}
-            CHARACTER.intelligence = json_character["intelligence"] if json_character["intelligence"] else 0
-            CHARACTER.room = Rooms.get_room_by_name(json_character["room"])
-            CHARACTER.kills = json_character["kills"] if json_character["kills"] else 0
-            CHARACTER.deaths = json_character["deaths"] if json_character["deaths"] else 0
+            Person.from_json(json_import["character"])
 
             # Rooms
             json_rooms = json_import["rooms"]
             for json_room in json_rooms:
-                room = Rooms.get_room_by_name(json_room["name"])
-                room.npc = NPC(
-                    name=json_room["npc"]["name"],
-                    health=json_room["npc"]["health"] if json_room["npc"]["health"] else 100,
-                    base_damage=json_room["npc"]["base_damage"] if json_room["npc"]["base_damage"] else 10,
-                    krit_damage=json_room["npc"]["krit_damage"] if json_room["npc"]["krit_damage"] else 0,
-                    krit_chance=json_room["npc"]["krit_chance"] if json_room["npc"]["krit_chance"] else 0,
-                    armor=json_room["npc"]["armor"] if json_room["npc"]["armor"] else 0,
-                    loot={Items.get_item_by_name(
-                        item_name): amount for item_name, amount in json_room["npc"]["loot"].items()} if json_room["npc"]["loot"] else None
-                ) if json_room["npc"] else None
-                room.loot = {}
-                room.visited = json_room["visited"] if json_room["visited"] else False
-                room.locked = json_room["locked"] if json_room["locked"] else False
-                room.lock_message = json_room["lock_message"] if json_room["lock_message"] else None
+                Room.from_json(json_room)
     except FileNotFoundError:
         print(f"\"{filename}\" does not exist")
 

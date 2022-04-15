@@ -2,25 +2,37 @@ import random
 
 from termcolor import colored
 
+from classes.inventory import Inventory
 from classes.item import Item
+
+DEFAULT_MAX_HEALTH = 100
+DEFAULT_HEALTH = None
+DEFAULT_BASE_DAMAGE = 10
+DEFAULT_KRIT_DAMAGE = 0
+DEFAULT_KRIT_CHANCE = 0
+DEFAULT_ARMOR = 0
+DEFAULT_LOOT = None
 
 
 class NPC:
     def __init__(self,
                  name: str,
-                 health: int = 100,
-                 base_damage: int = 10,
-                 krit_damage: int = 0,
-                 krit_chance: float = 0,
-                 armor: int = 0,
-                 loot: 'dict[Item]' = None):
-        self.name = name
-        self.health = health
-        self.base_damage = base_damage
-        self.krit_damage = krit_damage
-        self.krit_chance = krit_chance
-        self.armor = armor
-        self.loot = loot if loot is not None else dict()
+                 max_health: int = DEFAULT_MAX_HEALTH,
+                 health: int = DEFAULT_HEALTH,
+                 base_damage: int = DEFAULT_BASE_DAMAGE,
+                 krit_damage: int = DEFAULT_KRIT_DAMAGE,
+                 krit_chance: float = DEFAULT_KRIT_CHANCE,
+                 armor: int = DEFAULT_ARMOR,
+                 loot: 'dict[Item]' = DEFAULT_LOOT):
+        self.name: str = name
+        self.max_health: int = max_health
+        self.health: int = health if health else max_health
+        self.base_damage: int = base_damage
+        self.krit_damage: int = krit_damage
+        self.krit_chance: float = krit_chance
+        self.armor: int = armor
+        self.loot: 'Inventory[Item,int]' = loot if loot is not None else Inventory(
+        )
 
     def __str__(self):
         return colored(self.name, color="red")
@@ -29,13 +41,29 @@ class NPC:
         from world.items import Items
         return {
             "name": self.name,
+            "max_health": self.max_health,
             "health": self.health,
             "base_damage": self.base_damage,
             "krit_damage": self.krit_damage,
             "krit_chance": self.krit_chance,
             "armor": self.armor,
-            "loot": Items.dict_to_json(self.loot)
+            "loot": self.loot.to_json()
         }
+
+    @staticmethod
+    def from_json(json_object: 'dict') -> 'NPC':
+        from world.items import Items
+
+        return NPC(
+            name=json_object["name"],
+            max_health=json_object["max_health"] if json_object["max_health"] else DEFAULT_MAX_HEALTH,
+            health=json_object["health"] if json_object["health"] else DEFAULT_HEALTH,
+            base_damage=json_object["base_damage"] if json_object["base_damage"] else DEFAULT_BASE_DAMAGE,
+            krit_damage=json_object["krit_damage"] if json_object["krit_damage"] else DEFAULT_KRIT_DAMAGE,
+            krit_chance=json_object["krit_chance"] if json_object["krit_chance"] else DEFAULT_KRIT_CHANCE,
+            armor=json_object["armor"] if json_object["armor"] else DEFAULT_ARMOR,
+            loot=Inventory.from_json(json_object["loot"])
+        ) if json_object else None
 
     def attack(self) -> int:
         rand = random.random()
@@ -51,19 +79,11 @@ class NPC:
         else:
             self.health = max(self.health-int(damage / self.armor * 10), 0)
 
-    def show_npc_stats(self):
-        print(f"""
-            Health:  {colored(round(self.health), 'blue')}
-            Damage:  {self.base_damage}
-            Armor:   {self.armor}
-            Coin(s): {colored(self, 'yellow')}
-            """)
-
     def fighting_stats(self) -> str:
-        if self.health < 30:
+        if self.health/self.max_health < 0.3:
             health_color = "yellow"
             heart_icon = "💛"
-        elif self.health < 10:
+        elif self.health/self.max_health < 0.1:
             health_color = "red"
             heart_icon = "❤"
         else:

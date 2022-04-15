@@ -2,6 +2,7 @@ from enum import Enum
 
 from classes.npc import NPC
 from classes.room import Room
+from classes.inventory import Inventory
 
 from world.items import Items
 
@@ -34,38 +35,38 @@ class Rooms(Enum):
     # World 1: Creapy House
     BEDROOM: Room = Room(
         name="Bedroom",
-        loot={
+        loot=Inventory({
             Items.MAP_HOME.value: 1
-        },
+        }),
         visited=True)
     KITCHEN: Room = Room(
         name="Kitchen",
         npc=NPC(
             name="Zombie wife",
-            health=12,
+            max_health=12,
             base_damage=3,
-            loot={
+            loot=Inventory({
                 Items.KNIFE.value: 1,
                 Items.COIN.value: 3
-            }),
+            })),
         enter_room_function=kitchen)
     LOUNGE: Room = Room(
         name="Lounge",
-        loot={
+        loot=Inventory({
             Items.LOCKPICKER.value: 1,
             Items.COIN.value: 3
-        })
+        }))
     CORRIDOR: Room = Room(
         name="Corridor",
-        loot={
+        loot=Inventory({
             Items.COIN.value: 5
-        })
+        }))
     LIVING_ROOM: Room = Room(
         name="Living Room",
         lock_message=None,
-        loot={
+        loot=Inventory({
             Items.KEY_HOME.value: 1
-        })
+        }))
 
     # World 2: The outside world
     FRONT_YARD: Room = Room(
@@ -76,18 +77,18 @@ class Rooms(Enum):
         name="Garage",
         locked=True,
         lock_message="You couldn't find any key for the garage. It must opens differently...",
-        loot={
+        loot=Inventory({
             Items.BOW.value: 1,
             Items.COIN.value: 10,
-        },
-        items_to_buy={
+        }),
+        items_to_buy=Inventory({
             Items.ARMOR.value: 10,
-        })
+        }))
     GRAVESTONE: Room = Room(
         "Gravestone",
-        loot={
+        loot=Inventory({
             Items.COIN.value: 3
-        },
+        }),
         enter_room_function=gravestone)
 
     # World 2: The open world
@@ -95,16 +96,16 @@ class Rooms(Enum):
         name="Fence gate",
         npc=NPC(
             name="Zombie",
-            health=30,
+            max_health=30,
             base_damage=5,
-            loot={
+            loot=Inventory({
                 Items.COIN.value: 3
-            }))
+            })))
     NEIGHBOR: Room = Room(
         name="Neighbor",
-        loot={
+        loot=Inventory({
             Items.MAP_STREET.value: 1
-        },
+        }),
         enter_room_function=neighbor)
 
     @staticmethod

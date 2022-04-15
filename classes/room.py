@@ -1,29 +1,38 @@
 from termcolor import colored
 from utilities import text_print
 
+from classes.inventory import Inventory
 from classes.item import Item
 from classes.npc import NPC
+
+DEFAULT_NPC = None
+DEFAULT_LOOT = None
+DEFAULT_VISITED = False
+DEFAULT_LOCKED = False
+DEFAULT_LOCK_MESSAGE = None
+DEFAULT_ITEMS_TO_BUY = None
 
 
 class Room:
     def __init__(self,
                  name: str,
-                 npc: NPC = None,
-                 loot: 'dict[Item,int]' = None,
-                 visited: bool = False,
-                 locked: bool = False,
-                 lock_message: str = None,
+                 npc: NPC = DEFAULT_NPC,
+                 loot: 'Inventory[Item,int]' = DEFAULT_LOOT,
+                 visited: bool = DEFAULT_VISITED,
+                 locked: bool = DEFAULT_LOCKED,
+                 lock_message: str = DEFAULT_LOCK_MESSAGE,
                  enter_room_function=lambda: None,
-                 items_to_buy: 'dict[Item,int]' = None):
+                 items_to_buy: 'Inventory[Item,int]' = DEFAULT_ITEMS_TO_BUY):
         self.name = name
         self.connected_rooms = list()
         self.npc: NPC = npc
-        self.loot: 'dict[Item,int]' = loot if loot is not None else dict()
+        self.loot: 'Inventory[Item,int]' = loot if loot is not None else Inventory(
+        )
         self.visited: bool = visited
         self.enter_room_function = enter_room_function
         self.locked: bool = locked
         self.lock_message: str = lock_message
-        self.items_to_buy: 'dict[Item,int]' = items_to_buy if items_to_buy is not None else dict(
+        self.items_to_buy: 'Inventory[Item,int]' = items_to_buy if items_to_buy is not None else Inventory(
         )
 
     def __str__(self) -> str:
@@ -37,11 +46,24 @@ class Room:
         return {
             "name": self.name,
             "npc": self.npc.to_json() if self.npc else None,
-            "loot": Items.dict_to_json(self.loot),
+            "loot": self.loot.to_json(),
             "visited": self.visited,
             "locked": self.locked,
-            "lock_message": self.lock_message
+            "lock_message": self.lock_message,
+            "items_to_buy": self.items_to_buy.to_json()
         }
+
+    @staticmethod
+    def from_json(json_object: 'dict') -> 'Room':
+        from world.rooms import Rooms
+
+        room = Rooms.get_room_by_name(json_object["name"])
+        room.npc = NPC.from_json(json_object["npc"])
+        room.loot = Inventory.from_json(json_object["loot"])
+        room.visited = json_object["visited"] if json_object["visited"] else DEFAULT_VISITED
+        room.locked = json_object["locked"] if json_object["locked"] else DEFAULT_LOCK_MESSAGE
+        room.lock_message = json_object["lock_message"] if json_object["lock_message"] else None
+        room.items_to_buy = Inventory.from_json(json_object["items_to_buy"])
 
     def enter_room(self):
         if self.locked and self.lock_message:

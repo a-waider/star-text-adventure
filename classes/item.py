@@ -71,9 +71,22 @@ class Weapon(Item):
         return {
             "name": self.name,
             "plural": self.plural,
+            "icon": self.icon,
             "base_damage": self.base_damage,
             "damage_variation": self.damage_variation
         }
+
+    @staticmethod
+    def from_json(json_object: 'dict') -> 'Weapon':
+        if json_object:
+            return Weapon(
+                name=json_object["name"],
+                plural=json_object["plural"],
+                icon=json_object["icon"],
+                base_damage=json_object["base_damage"],
+                damage_variation=json_object["damage_variation"],
+            )
+        return None
 
     def attack(self) -> int:
         attack_damage = self.base_damage + \
@@ -93,7 +106,16 @@ class Weapon(Item):
 
 
 class WeaponMelee(Weapon):
-    pass
+    @staticmethod
+    def from_json(json_object: 'dict') -> 'WeaponMelee':
+        if json_object:
+            weapon: Weapon = Weapon.from_json(json_object)
+            return WeaponMelee(
+                name=weapon.name,
+                plural=weapon.plural,
+                icon=weapon.icon,
+                base_damage=weapon.base_damage)
+        return None
 
 
 class WeaponRanged(Weapon):
@@ -111,6 +133,18 @@ class WeaponRanged(Weapon):
         ret = super().to_json()
         ret["ammunition"] = self.ammunition
         return ret
+
+    @ staticmethod
+    def from_json(json_object: 'dict') -> 'WeaponRanged':
+        if json_object:
+            weapon: Weapon = super().from_json(json_object)
+            return WeaponRanged(
+                name=weapon.name,
+                plural=weapon.plural,
+                icon=weapon.icon,
+                base_damage=weapon.base_damage,
+                ammunition=json_object["ammunition"])
+        return None
 
     def attack(self) -> int:
         if self.ammunition > 0:
