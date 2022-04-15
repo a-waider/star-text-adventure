@@ -6,8 +6,12 @@ from classes.item import Item, Map, WeaponMelee, WeaponRanged
 ROOM_NAME_LENGTH = 15
 
 
-def book():
-    pass
+def armor():
+    from main import CHARACTER
+
+    amount_in_inventory = CHARACTER.inventory[Items.ARMOR.value]
+    CHARACTER.remove_from_inventory(Items.ARMOR.value, amount_in_inventory)
+    CHARACTER.armor += amount_in_inventory
 
 
 def key_front_door():
@@ -54,11 +58,15 @@ def map_street():
 
 
 class Items(Enum):
-    # World 1: Creapy House
+    # General
     COIN: Item = Item(
         name="Coin",
         plural="Coins",
         icon="🪙")
+    ARMOR: Item = Item(
+        name="Armor",
+        icon="🛡",
+        use_function=armor)
 
     # Keys
     KEY_HOME: Item = Item(

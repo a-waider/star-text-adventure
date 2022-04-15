@@ -11,7 +11,7 @@ def execute_commands(commands: 'list[str]'):
 def test_unlock_front_door():
     Rooms.FRONT_YARD.value.locked = True
     CHARACTER.room = Rooms.CORRIDOR.value
-    CHARACTER.inventory[Items.KEY_HOME.value] = 1
+    CHARACTER.add_to_inventory(Items.KEY_HOME.value)
     execute_commands(commands=[
         "use key front door"
     ])
@@ -34,7 +34,7 @@ def test_cant_go_to_locked_room():
 
 def test_equip_melee_weapon():
     CHARACTER.melee_weapon = Items.FIST.value
-    CHARACTER.inventory[Items.KNIFE.value] = 1
+    CHARACTER.add_to_inventory(Items.KNIFE.value)
     execute_commands(commands=[
         "equip knife"
     ])
@@ -45,12 +45,20 @@ def test_equip_melee_weapon():
 
 def test_equip_ranged_weapon():
     CHARACTER.ranged_weapon = None
-    CHARACTER.inventory[Items.BOW.value] = 1
+    CHARACTER.add_to_inventory(Items.BOW.value)
     execute_commands(commands=[
         "equip bow"
     ])
     assert CHARACTER.ranged_weapon == Items.BOW.value
     assert len(CHARACTER.inventory) == 0
+
+
+def test_use_armor():
+    CHARACTER.add_to_inventory(Items.ARMOR.value, 5)
+    execute_commands(commands=[
+        "use armor"
+    ])
+    assert CHARACTER.armor == 5
 
 
 def test_fight():
