@@ -38,10 +38,17 @@ def main(test_mode: bool = False, user_commands: 'list[str]' = None):
         valid_user_input = False
         for command in commands:
             if user_input.startswith(command.keyword) or [alias for alias in command.aliases if user_input.startswith(alias)]:
-                valid_user_input = True
-                if not bool(CHARACTER.room.npc) or command.available_in_fight:
+                if user_input.startswith(command.keyword):
                     args = user_input.replace(
                         command.keyword, "", 1).strip().lower().split(" ")
+                else:
+                    for alias in command.aliases:
+                        if user_input.startswith(alias):
+                            args = user_input.replace(
+                                alias, "", 1).strip().lower().split(" ")
+                            break
+                valid_user_input = True
+                if not bool(CHARACTER.room.npc) or command.available_in_fight:
                     command.run_command(current_room=CHARACTER.room, args=args)
                 else:
                     print("This command is disabled during fights")
