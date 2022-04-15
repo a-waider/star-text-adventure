@@ -5,6 +5,8 @@ from classes.item import Item, Map, Weapon, WeaponMelee, WeaponRanged
 from classes.npc import NPC
 from classes.room import Room
 
+from utilities import trailing_s
+
 # pylint: disable=unused-argument
 
 
@@ -21,7 +23,7 @@ def help_menu(args: 'list[str]'):
 def show_statistics(args: 'list[str]'):
     from main import CHARACTER
 
-    print("----- Statistics -----")
+    print(f"----- {trailing_s(CHARACTER)} Statistics -----")
     print(f"Kills: {CHARACTER.kills}")
     print(f"Deaths: {CHARACTER.deaths}")
     print("-----")
@@ -30,10 +32,7 @@ def show_statistics(args: 'list[str]'):
 def show_inventory(args: 'list[str]'):
     from main import CHARACTER
 
-    if str(CHARACTER).endswith("s"):
-        print(f"----- {CHARACTER}' Inventory -----")
-    else:
-        print(f"----- {CHARACTER}'s Inventory -----")
+    print(f"----- {trailing_s(CHARACTER)} Inventory -----")
     print(f"Melee weapon: {CHARACTER.melee_weapon}")
     if CHARACTER.ranged_weapon:
         print(f"Ranged weapon: {CHARACTER.ranged_weapon}")
@@ -48,8 +47,8 @@ def show_inventory(args: 'list[str]'):
 def show_health(args: 'list[str]'):
     from main import CHARACTER
 
-    print(f"----- {CHARACTER} -----")
-    print(CHARACTER.fighting_stats)
+    print(f"----- {trailing_s(CHARACTER)} Health -----")
+    print(CHARACTER.fighting_stats())
     print("-----")
 
 

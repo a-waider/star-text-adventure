@@ -42,13 +42,16 @@ class Person:
     def fighting_stats(self, ammunition: bool = False) -> str:
         if self.health < 30:
             health_color = "yellow"
+            heart_icon = "💛"
         elif self.health < 10:
             health_color = "red"
+            heart_icon = "❤"
         else:
             health_color = "green"
-        ret = f"Health: {colored(self.health, health_color)}\nArmor: {colored(self.armor, 'blue')}"
+            heart_icon = "💚"
+        ret = f"{'Health: ':15}{heart_icon} {colored(self.health, health_color)}\n{'Armor: ':15}🛡  {colored(self.armor, 'blue')}"
         if ammunition:
-            ret += f"Ammunition: {self.ranged_weapon.ammunition}"
+            ret += f"\n{'Ammunition: ':15}: {self.ranged_weapon.ammunition}"
         return ret
 
     def to_json(self) -> dict:
