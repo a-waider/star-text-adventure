@@ -16,6 +16,8 @@ def gravestone():
 
 
 def neighbor():
+    # pylint: disable=line-too-long
+
     from main import CHARACTER
 
     print("You enter the house of your neighbor and see him coverd in blood lying on the floor")
