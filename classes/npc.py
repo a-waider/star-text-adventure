@@ -1,6 +1,7 @@
 import random
 
 from termcolor import colored
+from utilities import colored_health
 
 from classes.inventory import Inventory
 from classes.item import Item
@@ -80,13 +81,5 @@ class NPC:
             self.health = max(self.health-int(damage / self.armor * 10), 0)
 
     def fighting_stats(self) -> str:
-        if self.health/self.max_health < 0.3:
-            health_color = "yellow"
-            heart_icon = "💛"
-        elif self.health/self.max_health < 0.1:
-            health_color = "red"
-            heart_icon = "❤"
-        else:
-            health_color = "green"
-            heart_icon = "💚"
+        heart_icon, health_color = colored_health(self.health, self.max_health)
         return f"{'Health: ':15}{heart_icon} {colored(self.health, health_color)}\n{'Armor: ':15}🛡  {colored(self.armor, 'blue')}"

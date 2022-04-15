@@ -2,6 +2,7 @@ import random
 
 from exceptions import NotEnoughInInventory, NotInInventory
 from termcolor import colored
+from utilities import colored_health
 from world.items import Items
 from world.rooms import Rooms
 
@@ -15,6 +16,7 @@ class Person:
             self,
             name: str = None,
             health: int = 100,
+            max_health: int = 100,
             luck: int = random.randint(1, 10),
             armor: int = 0,
             melee_weapon: WeaponMelee = Items.FIST.value,
@@ -26,6 +28,7 @@ class Person:
             deaths: int = 0):
         self.name: str = name
         self.health: int = health
+        self.max_health: int = max_health
         self.luck: int = luck
         self.armor: int = armor
         self.melee_weapon: WeaponMelee = melee_weapon
@@ -41,15 +44,7 @@ class Person:
         return self.name
 
     def fighting_stats(self, ammunition: bool = False) -> str:
-        if self.health < 30:
-            health_color = "yellow"
-            heart_icon = "💛"
-        elif self.health < 10:
-            health_color = "red"
-            heart_icon = "❤"
-        else:
-            health_color = "green"
-            heart_icon = "💚"
+        heart_icon, health_color = colored_health(self.health, self.max_health)
         ret = f"{'Health: ':15}{heart_icon} {colored(self.health, health_color)}\n{'Armor: ':15}🛡  {colored(self.armor, 'blue')}"
         if ammunition:
             ret += f"\n{'Ammunition: ':15}: {self.ranged_weapon.ammunition}"
@@ -59,6 +54,7 @@ class Person:
         return {
             "name": self.name,
             "health": self.health,
+            "max_health": self.max_health,
             "luck": self.luck,
             "armor": self.armor,
             "melee_weapon": self.melee_weapon.to_json() if self.melee_weapon else None,
@@ -76,6 +72,7 @@ class Person:
 
         CHARACTER.name = json_object["name"]
         CHARACTER.health = json_object["health"] if json_object["health"] else 100
+        CHARACTER.max_health = json_object["max_health"] if json_object["max_health"] else 100
         CHARACTER.luck = json_object["luck"] if json_object["luck"] else 0
         CHARACTER.armor = json_object["armor"] if json_object["armor"] else 0
         CHARACTER.melee_weapon = WeaponMelee.from_json(
