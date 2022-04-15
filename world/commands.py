@@ -1,4 +1,5 @@
 import json
+import sys
 
 from classes.command import Command
 from classes.item import Item, Map, Weapon, WeaponMelee, WeaponRanged
@@ -13,12 +14,15 @@ from world.rooms import Rooms, room_connections
 
 
 def help_menu(args: 'list[str]'):
+    from main import CHARACTER
+
     print("----- Help -----")
     print(
         f"{'Command':20}{'Arguments':19}: {'Description':70}{'Aliases':20}")
     for command in commands:
-        print(
-            f"{command.keyword:20}{', '.join(command.args):19}: {command.description:70}{', '.join(command.aliases):20}")
+        if not CHARACTER.room.npc or (CHARACTER.room.npc and command.available_in_fight):
+            print(
+                f"{command.keyword:20}{', '.join(command.args):19}: {command.description:70}{', '.join(command.aliases):20}")
     print("-----")
 
 
@@ -40,7 +44,7 @@ def show_inventory(args: 'list[str]'):
         print(f"Ranged weapon: {CHARACTER.ranged_weapon}")
     for item, amount in CHARACTER.inventory.items():
         if amount > 1:
-            print(f"{amount} {item.plural}")
+            print(f"{amount} {str(item, plural=True)}")
         else:
             print(item)
     print("-----")
@@ -167,17 +171,11 @@ def equip(args: 'list[str]'):
             raise Exception("Should never enter this branch")
         if isinstance(weapon, WeaponMelee):  # Melee Weapon
             if CHARACTER.melee_weapon:
-                if CHARACTER.melee_weapon in CHARACTER.inventory.keys():
-                    CHARACTER.inventory[CHARACTER.melee_weapon] += 1
-                else:
-                    CHARACTER.inventory[CHARACTER.melee_weapon] = 1
+                CHARACTER.add_to_inventory(CHARACTER.melee_weapon)
             CHARACTER.melee_weapon = weapon
         elif isinstance(weapon, WeaponRanged):  # Ranged Weapon
             if CHARACTER.ranged_weapon:
-                if CHARACTER.ranged_weapon in CHARACTER.inventory.keys():
-                    CHARACTER.inventory[CHARACTER.ranged_weapon] += 1
-                else:
-                    CHARACTER.inventory[CHARACTER.ranged_weapon] = 1
+                CHARACTER.add_to_inventory(CHARACTER.ranged_weapon)
             CHARACTER.ranged_weapon = weapon
         CHARACTER.remove_from_inventory(weapon)
     print(
@@ -241,10 +239,7 @@ def attack(args: 'list[str]'):
             print(CHARACTER.fighting_stats())
             print("-----")
             for item, amount in npc.loot.items():
-                if item in CHARACTER.inventory:
-                    CHARACTER.inventory[item] += amount
-                else:
-                    CHARACTER.inventory[item] = amount
+                CHARACTER.add_to_inventory(item, amount, force=True)
             if npc.loot:
                 print("New items in your inventory")
             CHARACTER.room.npc = None
@@ -256,7 +251,7 @@ def attack(args: 'list[str]'):
                 room for room in respawn_rooms if room.visited].pop(0)
             print(
                 f"You have been killed by {npc} and respawn in {CHARACTER.room}")
-            create_savepoint([""])
+            create_savepoint()
         else:
             print(f"----- {npc} -----")
             print(npc.fighting_stats())
@@ -267,10 +262,10 @@ def attack(args: 'list[str]'):
         print("There are no npc's to fight.")
 
 
-def create_savepoint(args: 'list[str]'):
+def create_savepoint(args: 'list[str]' = None):
     from main import CHARACTER, DEFAULT_SAVEPOINT_FILENAME
 
-    filename = args[0] if args[0] else DEFAULT_SAVEPOINT_FILENAME
+    filename = " ".join(args) if args else DEFAULT_SAVEPOINT_FILENAME
     json_output = {
         "character": CHARACTER.to_json(),
         "rooms": Rooms.to_json()
@@ -303,6 +298,12 @@ def import_savepoint(args: 'list[str]' = None):
 
     print(
         f"Successfully importet savepoint from \"{filename}\". Welcome back, {CHARACTER.name}. You are now in {CHARACTER.room}")
+
+
+def exit_game(args: 'list[str]' = None):
+    create_savepoint()
+    print("Exiting game...")
+    sys.exit(0)
 
 
 commands: 'list[Command]' = [
@@ -383,5 +384,9 @@ commands: 'list[Command]' = [
             args=["filename"],
             description="Imports a savepoint",
             available_in_fight=True,
-            command=import_savepoint)
+            command=import_savepoint),
+    Command("exit",
+            description="Exits the game",
+            available_in_fight=True,
+            command=exit_game)
 ]
