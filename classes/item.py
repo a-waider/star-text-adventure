@@ -11,11 +11,14 @@ class Item:
         self.icon: str = icon
         self.use_function = use_function
 
-    def __str__(self):
+    def __str__(self, plural: bool = False):
         ret = ""
         if self.icon:
             ret += f"{self.icon} "
-        ret += colored(self.name, "yellow")
+        if plural:
+            colored(self.plural, "yellow")
+        else:
+            ret += colored(self.name, "yellow")
         return ret
 
     def use(self):
@@ -23,7 +26,6 @@ class Item:
 
         if self.use_function:
             self.use_function()
-            CHARACTER.inventory.pop(self, None)
         else:
             raise UseFunctionNotDefined
 

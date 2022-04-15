@@ -22,6 +22,7 @@ def key_front_door():
 
     if CHARACTER.room == Rooms.CORRIDOR.value:
         Rooms.FRONT_YARD.value.locked = False
+        CHARACTER.remove_from_inventory(Items.KEY_HOME.value)
         print("The front door has been unlocked")
     else:
         print("You need to use this key in the corridor")
@@ -34,7 +35,7 @@ def lockpicker():
 
     if CHARACTER.room == Rooms.FRONT_YARD.value:
         Rooms.GARAGE.value.locked = False
-        print("The front door has been unlocked")
+        print("The garage door has been unlocked")
     else:
         print("The Lockpicker doesn't work in this room")
 
@@ -72,6 +73,7 @@ class Items(Enum):
         icon="🪙")
     ARMOR: Item = Item(
         name="Armor",
+        plural="Armor",
         icon="🛡",
         use_function=armor)
 
@@ -127,5 +129,5 @@ class Items(Enum):
     def dict_to_json(items: 'dict[Item]'):
         ret = dict()  # pylint: disable=duplicate-code
         for item, amount in items.items():
-            ret[str(item)] = amount
+            ret[item.name] = amount
         return ret

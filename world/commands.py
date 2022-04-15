@@ -59,10 +59,15 @@ def buy(args: 'list[str]'):
 
     item = Items.get_item_by_name(" ".join(args))
     if item in CHARACTER.room.items_to_buy:
-        if CHARACTER.inventory[Items.COIN.value] > CHARACTER.room.items_to_buy[item]:
+        if Items.COIN.value in CHARACTER.inventory.keys() and CHARACTER.inventory[Items.COIN.value] > CHARACTER.room.items_to_buy[item]:
             CHARACTER.remove_from_inventory(
                 Items.COIN.value, CHARACTER.room.items_to_buy[item])
             CHARACTER.add_to_inventory(item, CHARACTER.room.items_to_buy[item])
+            if CHARACTER.room.items_to_buy[item] == 1:
+                print(f"{item} has been added to your inventory.")
+            else:
+                print(
+                    f"{CHARACTER.room.items_to_buy[item]} {item.plural} have been added to your inventory.")
         else:
             print("You don't have enough coins in your inventory")
     else:
@@ -76,8 +81,8 @@ def take(args: 'list[str]'):
 
     item_name = " ".join(args)
     item = Items.get_item_by_name(item_name)
-    amount = CHARACTER.room.loot[item]
-    if item:
+    if item in CHARACTER.room.loot.keys():
+        amount = CHARACTER.room.loot[item]
         CHARACTER.room.loot.pop(item, None)
         CHARACTER.add_to_inventory(item, amount)
     else:
@@ -261,9 +266,9 @@ def attack(args: 'list[str]'):
 
 
 def create_savepoint(args: 'list[str]'):
-    from main import CHARACTER
+    from main import CHARACTER, DEFAULT_SAVEPOINT_FILENAME
 
-    filename = args[0] if args[0] else "savepoint.json"
+    filename = args[0] if args[0] else DEFAULT_SAVEPOINT_FILENAME
     json_output = {
         "character": CHARACTER.to_json(),
         "rooms": Rooms.to_json()
@@ -273,12 +278,13 @@ def create_savepoint(args: 'list[str]'):
     print(f"Successfully created savepoint at \"{filename}\"")
 
 
-def import_savepoint(args: 'list[str]'):
-    from main import CHARACTER
+def import_savepoint(args: 'list[str]' = None):
+    from main import CHARACTER, DEFAULT_SAVEPOINT_FILENAME
 
     from world.items import Items
 
-    filename = args[0] if args[0] else "savepoint.json"
+    filename = " ".join(args) if isinstance(
+        args, list) else DEFAULT_SAVEPOINT_FILENAME
     try:
         with open(filename) as file:
             json_import = json.loads(file.read())
@@ -302,7 +308,7 @@ def import_savepoint(args: 'list[str]'):
             CHARACTER.melee_weapon = melee_weapon
             CHARACTER.ranged_weapon = ranged_weapon
             CHARACTER.inventory = {Items.get_item_by_name(
-                item_name): amount for item_name, amount in json_character["inventory"]}
+                item_name): amount for item_name, amount in json_character["inventory"].items()}
             CHARACTER.intelligence = json_character["intelligence"] if json_character["intelligence"] else 0
             CHARACTER.room = Rooms.get_room_by_name(json_character["room"])
             CHARACTER.kills = json_character["kills"] if json_character["kills"] else 0

@@ -55,9 +55,6 @@ class Person:
         return ret
 
     def to_json(self) -> dict:
-        inventory_dict = {}
-        for item, amount in self.inventory:
-            inventory_dict[str(item)] = amount
         ranged_weapon = self.ranged_weapon.to_json() if self.ranged_weapon else None
         return {
             "name": self.name,
@@ -66,9 +63,9 @@ class Person:
             "armor": self.armor,
             "melee_weapon": self.melee_weapon.to_json(),
             "ranged_weapon": ranged_weapon,
-            "inventory": inventory_dict,
+            "inventory": Items.dict_to_json(self.inventory),
             "intelligence": self.intelligence,
-            "room": str(self.room),
+            "room": self.room.name,
             "kills": self.kills,
             "deaths": self.deaths
         }
@@ -94,7 +91,7 @@ class Person:
 
     def remove_from_inventory(self, item: Item, amount: int = 1):
         if item in self.inventory:
-            if amount > self.inventory[item]:
+            if amount < self.inventory[item]:
                 self.inventory[item] -= amount
             elif amount == self.inventory[item]:
                 self.inventory.pop(item, None)

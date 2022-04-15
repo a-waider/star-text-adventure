@@ -1,7 +1,10 @@
+import os
 from classes.person import Person
-from world.commands import commands
+from world.commands import commands, import_savepoint
 from world.items import Items
 from world.rooms import Rooms
+
+DEFAULT_SAVEPOINT_FILENAME = "savepoint.json"
 
 CHARACTER = Person(
     name="",
@@ -14,11 +17,14 @@ def main(test_mode: bool = False, user_commands: 'list[str]' = None):
     from main import CHARACTER
 
     if not test_mode:
-        CHARACTER.name = input(
-            "To beginn, please enter your character's name: ").strip()
-        if CHARACTER.room == Rooms.BEDROOM.value:  # Beginning of story telling
-            print("You wake up in your bed from a nightmare. Everything is still so fuzzy so you can't really see your surroundings. ")
-            print("To get an overview over the available commands type: \"help\"")
+        if os.path.isfile(DEFAULT_SAVEPOINT_FILENAME):
+            import_savepoint()
+        else:
+            CHARACTER.name = input(
+                "To beginn, please enter your character's name: ").strip()
+            if CHARACTER.room == Rooms.BEDROOM.value:  # Beginning of story telling
+                print("You wake up in your bed from a nightmare. Everything is still so fuzzy so you can't really see your surroundings. ")
+                print("To get an overview over the available commands type: \"help\"")
 
     while True:
         if test_mode:
