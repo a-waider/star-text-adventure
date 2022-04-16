@@ -9,7 +9,11 @@ from world.items import Items
 
 
 def kitchen():
-    pass
+    print([
+        "You just killed your own wife!",
+        "You're realizing that either you're still caught in a really bad dream or the zombie apocalypse became real.",
+        "Either way, you have to get through it and survive as long as you can."
+    ])
 
 
 def gravestone():
@@ -26,7 +30,7 @@ def neighbor_joe():
 
     print([
         "You enter the house of your neighbor and see him coverd in blood lying on the floor",
-        f"Neighbor: \"{CHARACTER}! Good you're still alive. Zombies raided my house.\"",
+        f"Neighbor: \"{CHARACTER}! Good you're still alive. Zombies attacked and raided my house.\"",
         "You: \"Yes my wife also turned into a Zombie. I needed to kill her to survive.\"",
         "Neighbor: \"I was able to protect this map of the streets from the Zombies. Hopefully it can help you to stay alive and stop the zombie apocalypse. My fight is over, good luck.\"",
         f"There is nothing you can do to help your neighbor. His injuries are too bad. Type \"view {Items.MAP_STREET.value}\" to view the map"])
