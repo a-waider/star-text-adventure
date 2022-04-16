@@ -14,11 +14,11 @@ def test_unlock_front_door():
     CHARACTER.room = Rooms.CORRIDOR.value
     CHARACTER.inventory.add_item(Items.KEY_HOME.value)
     execute_commands(commands=[
-        "use key front door"
+        f"use {Items.KEY_HOME.value.name}"
     ])
     assert Rooms.FRONT_YARD.value.locked is False
     execute_commands(commands=[
-        "go front yard"
+        f"go {Rooms.FRONT_YARD.value.name}"
     ])
     assert CHARACTER.room == Rooms.FRONT_YARD.value
 
@@ -40,7 +40,7 @@ def test_take_item():
     CHARACTER.room = Rooms.CORRIDOR.value
     CHARACTER.inventory = Inventory()
     execute_commands(commands=[
-        "take coin"
+        f"take {Items.COIN.value.name}"
     ])
     assert Items.COIN.value in CHARACTER.inventory
 
@@ -56,7 +56,7 @@ def test_drop_item():
         },
         max_items=1)
     execute_commands(commands=[
-        "take coin"
+        f"take {Items.COIN.value.name}"
     ])
     assert Items.COIN.value not in CHARACTER.inventory
     assert Items.COIN.value in CHARACTER.room.loot
@@ -66,7 +66,7 @@ def test_equip_melee_weapon():
     CHARACTER.melee_weapon = Items.FIST.value
     CHARACTER.inventory.add_item(Items.KNIFE.value)
     execute_commands(commands=[
-        "equip knife"
+        f"equip {Items.KNIFE.value.name}"
     ])
     assert CHARACTER.melee_weapon == Items.KNIFE.value
     assert Items.KNIFE.value not in CHARACTER.inventory.keys()
@@ -77,7 +77,7 @@ def test_equip_ranged_weapon():
     CHARACTER.ranged_weapon = None
     CHARACTER.inventory.add_item(Items.BOW.value)
     execute_commands(commands=[
-        "equip bow"
+        f"equip {Items.BOW.value.name}"
     ])
     assert CHARACTER.ranged_weapon == Items.BOW.value
     assert len(CHARACTER.inventory) == 0
@@ -87,7 +87,7 @@ def test_use_armor():
     CHARACTER.inventory.add_item(Items.ARMOR.value)
     assert CHARACTER.armor == 0
     execute_commands(commands=[
-        "use armor"
+        f"use {Items.ARMOR.value.name}"
     ])
     assert CHARACTER.armor == 1
 
@@ -112,7 +112,7 @@ def test_npc_loot_drops_in_room_loot_if_inventory_full():
             Items.ARMOR.value: 1
         }))
     execute_commands(commands=[
-        "go kitchen",
+        f"go {Rooms.KITCHEN.value.name}",
         "attack melee"
     ])
     assert Items.ARMOR.value not in list(CHARACTER.inventory.keys())
@@ -124,7 +124,7 @@ def test_update_respawn_point():
     CHARACTER.respawn_point = Rooms.BEDROOM.value
     Rooms.FRONT_YARD.value.locked = False
     execute_commands(commands=[
-        "go front yard"
+        f"go {Rooms.FRONT_YARD.value.name}"
     ])
     assert CHARACTER.respawn_point == Rooms.FRONT_YARD.value
 
@@ -133,7 +133,7 @@ def test_buy_item():
     CHARACTER.room = Rooms.GARAGE.value
     CHARACTER.inventory.add_item(Items.COIN.value, 100)
     execute_commands(commands=[
-        "buy armor"
+        f"buy {Items.ARMOR.value.name}"
     ])
     assert Items.ARMOR.value in CHARACTER.inventory
 
@@ -142,7 +142,7 @@ def test_buy_multiple_items(items_to_buy: int = 5,):
     CHARACTER.room = Rooms.GARAGE.value
     CHARACTER.inventory.add_item(Items.COIN.value, items_to_buy*100)
     execute_commands(commands=[
-        f"buy armor {items_to_buy}"
+        f"buy {Items.ARMOR.value.name} {items_to_buy}"
     ])
     assert CHARACTER.inventory[Items.ARMOR.value] == items_to_buy
     assert CHARACTER.inventory[Items.COIN.value] == items_to_buy*100 - \
@@ -154,7 +154,7 @@ def test_fight():
     Rooms.KITCHEN.value.npc = NPC("dummy", health=1, base_damage=3)
     CHARACTER.room = Rooms.LOUNGE.value
     execute_commands(commands=[
-        "go kitchen",
+        f"go {Rooms.KITCHEN.value.name}",
         "attack melee",
     ])
     assert CHARACTER.room.npc is None
@@ -170,5 +170,5 @@ def test_savepoints():
 def test_view_map():
     CHARACTER.inventory.add_item(Items.MAP_HOME.value)
     execute_commands(commands=[
-        "view home map"
+        f"view {Items.MAP_HOME.value.name}"
     ])
