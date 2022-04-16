@@ -253,7 +253,7 @@ def attack(args: 'list[str]'):
                     new_items_string += f" and {item.__str__(amount=amount)}"
                 else:
                     new_items_string += f", {item.__str__(amount=amount)}"
-                if not CHARACTER.inventory.add_item(item, amount, force=True):
+                if not CHARACTER.inventory.add_item(item, amount):
                     CHARACTER.room.loot.add_item(item, amount)
             if npc.loot:
                 if len(list(npc.loot.keys())) > 1 or npc.loot[list(npc.loot.keys())[0]] > 1:

@@ -1,5 +1,3 @@
-from exceptions import NotEnoughInInventory, NotInInventory
-
 from classes.item import Item
 
 
@@ -25,11 +23,11 @@ class Inventory(dict):
                 max_items=json_object["max_items"])
         return Inventory()
 
-    def add_item(self, item: Item, amount: int = 1, force: bool = False) -> bool:
+    def add_item(self, item: Item, amount: int = 1) -> bool:
         if item in self:
             self[item] += amount
         else:
-            if self.max_items is None or (self.max_items is not None and len(self) < self.max_items) or force:
+            if self.max_items is None or (self.max_items is not None and len(self) < self.max_items):
                 self[item] = amount
                 return True
             print(
