@@ -69,6 +69,12 @@ class Room:
         room.items_to_buy = Inventory.from_json(json_object["items_to_buy"])
 
     def enter_room(self):
+        from main import CHARACTER
+
+        if not self.visited and CHARACTER.respawn_point:
+            CHARACTER.respawn_point = self
+            print("Your respawn point has been updated.")
+        self.visited = True
         if self.locked and self.lock_message:
             print(f"{self.lock_message}\n")
             return
@@ -79,15 +85,20 @@ class Room:
             return
         if self.enter_room_function:
             self.enter_room_function()
-        print(f"You are now in {self}.\n")
+        print(f"You are now in {self}.")
         if self.items_to_buy:
-            print(self.buy_menu())
+            print(self.buy_menu(), sleep_time=0.0001)
 
     def buy_menu(self) -> str:
-        ret = f"""----- {self} shop -----\n{'Item':20}{'Price':10}"""
+        ret = []
+        ret.extend([
+            f"----- {self} shop -----",
+            f"{'Item':20}{'Price':10}"
+        ])
         for item, price in self.items_to_buy.items():
-            ret += f"\n{str(item):20}{price:10}"
-        return ret + "\n-----"
+            ret.append(f"{str(item):20}{price:10}")
+        ret.append("-----")
+        return "\n".join(ret)
 
     def get_connected_rooms(self) -> 'list[Room]':
         from world.rooms import room_connections

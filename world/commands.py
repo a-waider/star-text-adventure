@@ -16,14 +16,15 @@ from world.rooms import Rooms, room_connections
 def help_menu(args: 'list[str]'):
     from main import CHARACTER
 
-    print("----- Help -----")
+    sleep_time = 0.0001
+    print("----- Help -----", sleep_time=sleep_time)
     print(
-        f"{'Command':20}{'Arguments':19}: {'Description':70}{'Aliases':20}")
+        f"{'Command':20}{'Arguments':19}: {'Description':70}{'Aliases':20}", sleep_time=sleep_time)
     for command in commands:
         if not bool(CHARACTER.room.npc) or command.available_in_fight:
             print(
-                f"{command.keyword:20}{', '.join(command.args):19}: {command.description:70}{', '.join(command.aliases):20}")
-    print("-----")
+                f"{command.keyword:20}{' '.join(command.args):19}: {command.description:70}{', '.join(command.aliases):20}", sleep_time=sleep_time)
+    print("-----", sleep_time=sleep_time)
 
 
 def show_statistics(args: 'list[str]'):
@@ -43,10 +44,7 @@ def show_inventory(args: 'list[str]'):
     if CHARACTER.ranged_weapon:
         print(f"Ranged weapon: {CHARACTER.ranged_weapon}")
     for item, amount in CHARACTER.inventory.items():
-        if amount > 1:
-            print(f"{amount}x {item.__str__(plural=True)}")
-        else:
-            print(item)
+        print(f"{item.__str__(amount=amount)}")
     print("-----")
 
 
@@ -70,10 +68,11 @@ def buy(args: 'list[str]'):
         amount = 1
     item = Items.get_item_by_name(" ".join(args))
     if item in CHARACTER.room.items_to_buy:
-        if Items.COIN.value in CHARACTER.inventory.keys() and CHARACTER.inventory[Items.COIN.value] >= amount:
+        cost = CHARACTER.room.items_to_buy[item]
+        if Items.COIN.value in CHARACTER.inventory.keys() and CHARACTER.inventory[Items.COIN.value] >= amount*cost:
             CHARACTER.remove_from_inventory(
-                Items.COIN.value, amount)
-            CHARACTER.add_to_inventory(item, CHARACTER.room.items_to_buy[item])
+                Items.COIN.value, amount*cost)
+            CHARACTER.add_to_inventory(item, amount)
             if amount == 1:
                 print(f"{item} has been added to your inventory.")
             else:
@@ -105,10 +104,7 @@ def search_room(args: 'list[str]'):
 
     loot: 'dict[Item]' = CHARACTER.room.loot
     for loot_item, amount in loot.items():
-        if amount > 1:
-            print(f"{amount} {loot_item.plural}")
-        else:
-            print(loot_item)
+        print(loot_item.__str__(amount=amount))
 
 
 def use(args: 'list[str]'):
@@ -166,9 +162,6 @@ def go(args: 'list[str]'):
             if next_room.locked:
                 print(next_room.lock_message)
             else:
-                if not next_room.visited and next_room.respawn_point:
-                    CHARACTER.respawn_point = next_room
-                    print("Your respawn point has been updated")
                 CHARACTER.room = next_room
                 CHARACTER.room.enter_room()
             return
@@ -191,8 +184,10 @@ def equip(args: 'list[str]'):
                 CHARACTER.add_to_inventory(CHARACTER.ranged_weapon)
             CHARACTER.ranged_weapon = weapon
         CHARACTER.remove_from_inventory(weapon)
-    print(
-        f"You have now {weapon} equipped. Your previous equipped weapon is in your inventory.")
+        print(
+            f"You have now {weapon} equipped. Your previous equipped weapon is in your inventory.")
+    else:
+        print(f"You can't equip {' '.join(args)}")
 
 
 def inspect(args: 'list[str]'):
@@ -270,8 +265,7 @@ def attack(args: 'list[str]'):
         elif CHARACTER.health <= 0:
             CHARACTER.deaths += 1
             CHARACTER.health = 100
-            CHARACTER.room = [
-                room for room in respawn_rooms if room.visited].pop(0)
+            CHARACTER.room = CHARACTER.respawn_point
             print(
                 f"You have been killed by {npc} and respawn in {CHARACTER.room}")
             create_savepoint()
@@ -322,6 +316,7 @@ def import_savepoint(args: 'list[str]' = None):
 
     print(
         f"Successfully importet savepoint from \"{filename}\". Welcome back, {CHARACTER.name}. You are now in {CHARACTER.room}.")
+    CHARACTER.room.enter_room()
 
 
 def exit_game(args: 'list[str]' = None):
@@ -373,10 +368,10 @@ commands: 'list[Command]' = [
             command=buy),
     Command("take",
             args=["item"],
-            description="Takes an item into the inventory",
+            description="Takes all items of a kind into the inventory",
             command=take),
     Command("use",
-            args=["item"],
+            args=["item", "amount"],
             description="Uses an item from your inventory",
             command=use),
     Command("view",
