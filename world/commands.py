@@ -116,10 +116,15 @@ def use(args: 'list[str]'):
 
     from world.items import Items
 
+    try:
+        int(args[-1])
+        amount = int(args.pop())
+    except ValueError:
+        amount = 1
     item_name = " ".join(args)
     item = Items.get_item_by_name(item_name)
     if item in CHARACTER.inventory:
-        item.use()
+        item.use(amount=amount)
     else:
         print("You don't have this item in your inventory")
 

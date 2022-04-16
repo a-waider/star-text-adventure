@@ -21,11 +21,11 @@ class Item:
             ret += colored(self.name, "yellow")
         return ret
 
-    def use(self):
+    def use(self, amount: int = 1):
         from main import CHARACTER
 
         if self.use_function:
-            self.use_function()
+            self.use_function(amount=amount)
         else:
             raise UseFunctionNotDefined
 
