@@ -1,8 +1,9 @@
 from enum import Enum
 
+from classes.inventory import Inventory
 from classes.npc import NPC
 from classes.room import Room
-from classes.inventory import Inventory
+from utilities import print
 
 from world.items import Items
 
@@ -12,8 +13,10 @@ def kitchen():
 
 
 def gravestone():
-    print("Why is there a gravestone in the front yard?")
-    print("Ledgends say that here lies the old guard, the savior from the zombie apocalypse.")
+    print([
+        "Why is there a gravestone in the front yard?",
+        "Ledgends say that here lies the old guard, the savior from the zombie apocalypse."
+    ])
 
 
 def neighbor_joe():
@@ -21,13 +24,13 @@ def neighbor_joe():
 
     from main import CHARACTER
 
-    print("You enter the house of your neighbor and see him coverd in blood lying on the floor")
-    print(
-        f"Neighbor: \"{CHARACTER}! Good you're still alive. Zombies raided my house.\"")
-    print("You: \"Yes my wife also turned into a Zombie. I needed to kill her to survive.\"")
-    print("Neighbor: \"I was able to protect this map of the streets from the Zombies. Hopefully it can help you to stay alive and stop the zombie apocalypse. My fight is over, good luck.\"")
-    print(
-        f"There is nothing you can do to help your neighbor. His injuries are too bad. Type \"view {Items.MAP_STREET.value}\" to view the map")
+    print([
+        "You enter the house of your neighbor and see him coverd in blood lying on the floor",
+        f"Neighbor: \"{CHARACTER}! Good you're still alive. Zombies raided my house.\"",
+        "You: \"Yes my wife also turned into a Zombie. I needed to kill her to survive.\"",
+        "Neighbor: \"I was able to protect this map of the streets from the Zombies. Hopefully it can help you to stay alive and stop the zombie apocalypse. My fight is over, good luck.\"",
+        f"There is nothing you can do to help your neighbor. His injuries are too bad. Type \"view {Items.MAP_STREET.value}\" to view the map"])
+
     CHARACTER.add_to_inventory(Items.MAP_STREET.value)
 
 

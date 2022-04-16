@@ -2,6 +2,7 @@ import random
 
 from exceptions import UseFunctionNotDefined
 from termcolor import colored
+from utilities import print
 
 
 class Item:

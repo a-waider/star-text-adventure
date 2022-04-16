@@ -2,7 +2,7 @@ import random
 
 from exceptions import NotEnoughInInventory, NotInInventory
 from termcolor import colored
-from utilities import colored_health
+from utilities import colored_health, print
 from world.items import Items
 from world.rooms import Rooms
 

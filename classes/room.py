@@ -1,5 +1,5 @@
 from termcolor import colored
-from utilities import text_print
+from utilities import print
 
 from classes.inventory import Inventory
 from classes.item import Item
@@ -70,7 +70,7 @@ class Room:
 
     def enter_room(self):
         if self.locked and self.lock_message:
-            text_print(f"{self.lock_message}\n")
+            print(f"{self.lock_message}\n")
             return
         if self.npc:
             print(f"----- {self.npc} -----")
@@ -79,7 +79,7 @@ class Room:
             return
         if self.enter_room_function:
             self.enter_room_function()
-        text_print(f"You are now in {self}.\n")
+        print(f"You are now in {self}.\n")
         if self.items_to_buy:
             print(self.buy_menu())
 

@@ -1,13 +1,24 @@
-import sys
 import time
 from typing import Tuple
 
 
-def text_print(text, sleep_time: int = 0.01):
-    for i in text:
-        sys.stdout.write(i)
-        sys.stdout.flush()
-        time.sleep(sleep_time)
+def print(text: 'list[str]' = "", sleep_time: int = 0.01):
+    from builtins import print
+
+    def text_print(text: str, sleep_time: int = 0.01):
+        for character in text:
+            print(character, end="")
+            time.sleep(sleep_time)
+
+    if isinstance(text, list):
+        for sentence in text:
+            text_print(sentence, sleep_time=sleep_time)
+            input(" <enter>")
+    elif isinstance(text, str):
+        text_print(text, sleep_time=sleep_time)
+        print()
+    else:
+        raise Exception
 
 
 def trailing_s(name: str) -> str:

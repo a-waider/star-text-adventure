@@ -1,9 +1,11 @@
 import os
 import signal
 import sys
+
 import readchar
 
 from classes.person import Person
+from utilities import print
 from world.commands import commands, create_savepoint, import_savepoint
 from world.items import Items
 from world.rooms import Rooms
@@ -19,7 +21,7 @@ CHARACTER.ranged_weapon = None
 
 def handler(signum, frame):
     msg = "\nCtrl-c was pressed. Do you really want to exit? (y)"
-    print(msg, end="", flush=True)
+    print(msg)
     res = readchar.readchar()
     if res == "y":
         print()
@@ -27,9 +29,9 @@ def handler(signum, frame):
         print("Exiting...")
         sys.exit(0)
     else:
-        print("", end="\r", flush=True)
-        print(" " * len(msg), end="", flush=True)
-        print("    ", end="\r", flush=True)
+        print("\r")
+        print(" " * len(msg))
+        print("    \r")
 
 
 signal.signal(signal.SIGINT, handler)
@@ -45,7 +47,10 @@ def main(test_mode: bool = False, user_commands: 'list[str]' = None):
             CHARACTER.name = input(
                 "To beginn, please enter your character's name: ").strip()
             if CHARACTER.room == Rooms.BEDROOM.value:  # Beginning of story telling
-                print("You wake up in your bed from a nightmare. Everything is still so fuzzy so you can't really see your surroundings. ")
+                print([
+                    "You wake up in your bed from a nightmare.",
+                    "Everything is still so fuzzy so you can't really see your surroundings."
+                ])
                 print("To get an overview over the available commands type: \"help\"")
 
     while True:

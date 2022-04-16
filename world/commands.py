@@ -6,7 +6,7 @@ from classes.item import Item, Map, Weapon, WeaponMelee, WeaponRanged
 from classes.npc import NPC
 from classes.person import Person
 from classes.room import Room
-from utilities import trailing_s
+from utilities import print, trailing_s
 
 from world.rooms import Rooms, room_connections
 
@@ -321,7 +321,7 @@ def import_savepoint(args: 'list[str]' = None):
         print(f"\"{filename}\" does not exist")
 
     print(
-        f"Successfully importet savepoint from \"{filename}\". Welcome back, {CHARACTER.name}. You are now in {CHARACTER.room}")
+        f"Successfully importet savepoint from \"{filename}\". Welcome back, {CHARACTER.name}. You are now in {CHARACTER.room}.")
 
 
 def exit_game(args: 'list[str]' = None):

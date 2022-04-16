@@ -1,4 +1,5 @@
 from exceptions import CommandFunctionNotDefined
+from utilities import print
 
 from classes.room import Room
 

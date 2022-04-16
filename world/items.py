@@ -3,6 +3,7 @@ from enum import Enum
 from classes.item import Item, Map, WeaponMelee, WeaponRanged
 from classes.room import Room
 from termcolor import colored
+from utilities import print
 
 ROOM_NAME_LENGTH = 24
 
@@ -69,6 +70,7 @@ def lockpicker(amount: int):
 
 def _room_string(room: Room) -> str:
     from main import CHARACTER
+
     from world.items import ROOM_NAME_LENGTH
 
     if CHARACTER.room == room:
