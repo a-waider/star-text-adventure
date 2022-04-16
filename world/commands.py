@@ -20,7 +20,7 @@ def help_menu(args: 'list[str]'):
     print(
         f"{'Command':20}{'Arguments':19}: {'Description':70}{'Aliases':20}")
     for command in commands:
-        if not CHARACTER.room.npc or (CHARACTER.room.npc and command.available_in_fight):
+        if not bool(CHARACTER.room.npc) or command.available_in_fight:
             print(
                 f"{command.keyword:20}{', '.join(command.args):19}: {command.description:70}{', '.join(command.aliases):20}")
     print("-----")
@@ -44,7 +44,7 @@ def show_inventory(args: 'list[str]'):
         print(f"Ranged weapon: {CHARACTER.ranged_weapon}")
     for item, amount in CHARACTER.inventory.items():
         if amount > 1:
-            print(f"{amount} {str(item, plural=True)}")
+            print(f"{amount}x {item.__str__(plural=True)}")
         else:
             print(item)
     print("-----")
@@ -63,17 +63,22 @@ def buy(args: 'list[str]'):
 
     from world.items import Items
 
+    try:
+        int(args[-1])
+        amount = int(args.pop())
+    except ValueError:
+        amount = 1
     item = Items.get_item_by_name(" ".join(args))
     if item in CHARACTER.room.items_to_buy:
-        if Items.COIN.value in CHARACTER.inventory.keys() and CHARACTER.inventory[Items.COIN.value] > CHARACTER.room.items_to_buy[item]:
+        if Items.COIN.value in CHARACTER.inventory.keys() and CHARACTER.inventory[Items.COIN.value] >= amount:
             CHARACTER.remove_from_inventory(
-                Items.COIN.value, CHARACTER.room.items_to_buy[item])
+                Items.COIN.value, amount)
             CHARACTER.add_to_inventory(item, CHARACTER.room.items_to_buy[item])
-            if CHARACTER.room.items_to_buy[item] == 1:
+            if amount == 1:
                 print(f"{item} has been added to your inventory.")
             else:
                 print(
-                    f"{CHARACTER.room.items_to_buy[item]} {item.plural} have been added to your inventory.")
+                    f"{amount} {item.__str__(plural=True)} have been added to your inventory.")
         else:
             print("You don't have enough coins in your inventory")
     else:
@@ -188,14 +193,14 @@ def inspect(args: 'list[str]'):
     weapon = Weapon.get_weapon_by_name(" ".join(args))
     weapons = []
     if CHARACTER.melee_weapon:
-        weapons.append(CHARACTER.melee_weapon)
+        weapons.append(CHARACTER.melee_weapon.name)
     if CHARACTER.ranged_weapon:
-        weapons.append(CHARACTER.ranged_weapon)
+        weapons.append(CHARACTER.ranged_weapon.name)
     for item in CHARACTER.inventory:
         if isinstance(item, Weapon):
-            weapons.append(item)
+            weapons.append(item.name)
 
-    if weapon in weapons:
+    if weapon and weapon.name in weapons:
         print(f"----- {weapon} -----")
         print(f"Base damage: {weapon.base_damage}")
         print(f"Damage variation: {weapon.damage_variation}")
@@ -342,7 +347,7 @@ commands: 'list[Command]' = [
             description="Searches the room for loot",
             command=search_room),
     Command("buy",
-            args=["item"],
+            args=["item", "amount"],
             description="Buys an item",
             valid_rooms=[
                 Rooms.GARAGE.value,

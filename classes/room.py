@@ -79,9 +79,9 @@ class Room:
             print(self.buy_menu())
 
     def buy_menu(self) -> str:
-        ret = f"""----- {self} shop -----\n{'Item':15}{'Price':10}"""
+        ret = f"""----- {self} shop -----\n{'Item':20}{'Price':10}"""
         for item, price in self.items_to_buy.items():
-            ret += f"\n{str(item):15}{price:10}"
+            ret += f"\n{str(item):20}{price:10}"
         return ret + "\n-----"
 
     def get_connected_rooms(self) -> 'list[Room]':

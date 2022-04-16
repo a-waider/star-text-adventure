@@ -14,9 +14,9 @@ class Item:
     def __str__(self, plural: bool = False):
         ret = ""
         if self.icon:
-            ret += f"{self.icon} "
+            ret += f"{self.icon}  "
         if plural:
-            colored(self.plural, "yellow")
+            ret += colored(self.plural, "yellow")
         else:
             ret += colored(self.name, "yellow")
         return ret
@@ -89,9 +89,7 @@ class Weapon(Item):
         return None
 
     def attack(self) -> int:
-        attack_damage = self.base_damage + \
-            random.randint(0, self.damage_variation)
-        return attack_damage
+        return self.base_damage + random.randint(0, self.damage_variation)
 
     @staticmethod
     def get_weapon_by_name(name: str) -> 'Weapon':
@@ -137,7 +135,7 @@ class WeaponRanged(Weapon):
     @ staticmethod
     def from_json(json_object: 'dict') -> 'WeaponRanged':
         if json_object:
-            weapon: Weapon = super().from_json(json_object)
+            weapon: Weapon = Weapon.from_json(json_object)
             return WeaponRanged(
                 name=weapon.name,
                 plural=weapon.plural,
@@ -148,6 +146,6 @@ class WeaponRanged(Weapon):
 
     def attack(self) -> int:
         if self.ammunition > 0:
-            super().attack()
+            return super().attack()
         else:
             print("You have no more ammunition")

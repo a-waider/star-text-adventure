@@ -1,6 +1,6 @@
 import random
 
-from exceptions import NotEnoughInInventory, NotInInventory, NotEnoughInventorySpace
+from exceptions import NotEnoughInInventory, NotInInventory
 from termcolor import colored
 from utilities import colored_health
 from world.items import Items
@@ -122,3 +122,6 @@ class Person:
                 raise NotEnoughInInventory
         else:
             raise NotInInventory
+
+    def add_health(self, health_points: int):
+        self.health = min(self.health+health_points, self.max_health)
