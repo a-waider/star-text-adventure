@@ -166,6 +166,9 @@ def go(args: 'list[str]'):
             if next_room.locked:
                 print(next_room.lock_message)
             else:
+                if not next_room.visited and next_room.respawn_point:
+                    CHARACTER.respawn_point = next_room
+                    print("Your respawn point has been updated")
                 CHARACTER.room = next_room
                 CHARACTER.room.enter_room()
             return

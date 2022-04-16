@@ -25,6 +25,7 @@ class Person:
             max_inventory_items: int = 10,
             intelligence: int = 100,
             room: Room = Rooms.BEDROOM,
+            respawn_point: Room = Rooms.BEDROOM,
             kills: int = 0,
             deaths: int = 0):
         self.name: str = name
@@ -39,6 +40,7 @@ class Person:
         self.max_inventory_items: int = max_inventory_items
         self.intelligence: int = intelligence
         self.room: Room = room
+        self.respawn_point: Room = respawn_point
         self.kills: int = kills
         self.deaths: int = deaths
 
@@ -65,6 +67,7 @@ class Person:
             "max_inventory_items": self.max_inventory_items,
             "intelligence": self.intelligence,
             "room": self.room.name,
+            "respawn_point": self.respawn_point.name,
             "kills": self.kills,
             "deaths": self.deaths
         }
@@ -86,6 +89,8 @@ class Person:
         CHARACTER.max_inventory_items = json_object["max_inventory_items"]
         CHARACTER.intelligence = json_object["intelligence"] if json_object["intelligence"] else 0
         CHARACTER.room = Rooms.get_room_by_name(json_object["room"])
+        CHARACTER.respawn_point = Rooms.get_room_by_name(
+            json_object["respawn_point"])
         CHARACTER.kills = json_object["kills"] if json_object["kills"] else 0
         CHARACTER.deaths = json_object["deaths"] if json_object["deaths"] else 0
 

@@ -15,7 +15,7 @@ def test_unlock_front_door():
     execute_commands(commands=[
         "use key front door"
     ])
-    assert Rooms.FRONT_YARD.value.locked is False
+    assert not Rooms.FRONT_YARD.value.locked is False
     execute_commands(commands=[
         "go front yard"
     ])
@@ -59,6 +59,16 @@ def test_use_armor():
         "use armor"
     ])
     assert CHARACTER.armor == 5
+
+
+def test_update_respawn_point():
+    CHARACTER.room = Rooms.CORRIDOR.value
+    CHARACTER.respawn_point = Rooms.BEDROOM.value
+    Rooms.FRONT_YARD.value.locked = False
+    execute_commands(commands=[
+        "go front yard"
+    ])
+    assert CHARACTER.respawn_point == Rooms.FRONT_YARD.value
 
 
 def test_buy_item():

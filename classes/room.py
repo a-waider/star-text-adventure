@@ -8,6 +8,7 @@ from classes.npc import NPC
 DEFAULT_NPC = None
 DEFAULT_LOOT = None
 DEFAULT_VISITED = False
+DEFAULT_RESPAWN_POINT = False
 DEFAULT_LOCKED = False
 DEFAULT_LOCK_MESSAGE = None
 DEFAULT_ITEMS_TO_BUY = None
@@ -19,6 +20,7 @@ class Room:
                  npc: NPC = DEFAULT_NPC,
                  loot: 'Inventory[Item,int]' = DEFAULT_LOOT,
                  visited: bool = DEFAULT_VISITED,
+                 respawn_point: bool = DEFAULT_RESPAWN_POINT,
                  locked: bool = DEFAULT_LOCKED,
                  lock_message: str = DEFAULT_LOCK_MESSAGE,
                  enter_room_function=lambda: None,
@@ -29,6 +31,7 @@ class Room:
         self.loot: 'Inventory[Item,int]' = loot if loot is not None else Inventory(
         )
         self.visited: bool = visited
+        self.respawn_point: bool = respawn_point
         self.enter_room_function = enter_room_function
         self.locked: bool = locked
         self.lock_message: str = lock_message
@@ -46,6 +49,7 @@ class Room:
             "npc": self.npc.to_json() if self.npc else None,
             "loot": self.loot.to_json(),
             "visited": self.visited,
+            "respawn_point": self.respawn_point,
             "locked": self.locked,
             "lock_message": self.lock_message,
             "items_to_buy": self.items_to_buy.to_json()
@@ -59,6 +63,7 @@ class Room:
         room.npc = NPC.from_json(json_object["npc"])
         room.loot = Inventory.from_json(json_object["loot"])
         room.visited = json_object["visited"] if json_object["visited"] else DEFAULT_VISITED
+        room.respawn_point = json_object["respawn_point"] if json_object["respawn_point"] else DEFAULT_RESPAWN_POINT
         room.locked = json_object["locked"] if json_object["locked"] else DEFAULT_LOCK_MESSAGE
         room.lock_message = json_object["lock_message"] if json_object["lock_message"] else None
         room.items_to_buy = Inventory.from_json(json_object["items_to_buy"])

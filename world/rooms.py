@@ -38,7 +38,8 @@ class Rooms(Enum):
         loot=Inventory({
             Items.MAP_HOME.value: 1
         }),
-        visited=True)
+        visited=True,
+        respawn_point=True)
     KITCHEN: Room = Room(
         name="Kitchen",
         npc=NPC(
@@ -70,7 +71,8 @@ class Rooms(Enum):
     FRONT_YARD: Room = Room(
         name="Front yard",
         locked=True,
-        lock_message="Because you are always afraid of thieves you lock your front door. But where is the key?")
+        lock_message="Because you are always afraid of thieves you lock your front door. But where is the key?",
+        respawn_point=True)
     GARAGE: Room = Room(
         name="Garage",
         locked=True,
