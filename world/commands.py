@@ -24,8 +24,7 @@ def help_menu(args: 'list[str]'):
     for command in Commands:
         if not bool(CHARACTER.room.npc) or command.value.available_in_fight:
             print(
-                f"{command.value.keyword:20}{' '.join([f'<{arg}>' for arg in command.value.args]):19}\
-                    {command.value.description:70}{', '.join(command.value.aliases):20}", sleep_time=sleep_time)
+                f"{command.value.keyword:20}{' '.join([f'<{arg}>' for arg in command.value.args]):19}{command.value.description:70}{', '.join(command.value.aliases):20}", sleep_time=sleep_time)
     print("-----", sleep_time=sleep_time)
 
 
@@ -270,7 +269,7 @@ def attack(args: 'list[str]'):
             print(f"----- {CHARACTER} ----")
             print(CHARACTER.fighting_stats())
             print("-----")
-            print(f"You defeated {npc}")
+            print(f"You defeated {npc}.")
             new_items_string = ""
             for item, amount in npc.loot.items():
                 if item == list(npc.loot.keys())[0]:

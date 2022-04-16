@@ -179,14 +179,15 @@ class Rooms(Enum):
             krit_damage=10,
             krit_chance=0.4,
             loot=Inventory({
-                Items.COIN.value: 15,
-                Items.ARMOR.value: 15,
+                Items.COIN.value: 10,
+                Items.ARMOR.value: 8,
             })))
     PRINCESS_MAGDALENA_GARDEN: Room = Room(
         name="Princess Magdalena garden",
         npc=NPC(
             name="Zombie tank",
             max_health=60,
+            armor=30,
             base_damage=10,
             krit_damage=12,
             krit_chance=0.5,

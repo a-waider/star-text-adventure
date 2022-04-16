@@ -36,4 +36,4 @@ class Command:
             else:
                 raise CommandFunctionNotDefined
         else:
-            print("You can't run this command in this room")
+            print("You can't run this command in this room.")

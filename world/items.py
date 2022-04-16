@@ -160,7 +160,6 @@ class Items(Enum):
     # Weapons
     REMOTE: WeaponMelee = WeaponMelee(
         name="Remote",
-        icon="👊",
         base_damage=5,
         damage_variation=1)
     KNIFE: WeaponMelee = WeaponMelee(

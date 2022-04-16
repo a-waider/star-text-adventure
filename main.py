@@ -89,7 +89,7 @@ def main(test_mode: bool = False, user_commands: 'list[str]' = None):
                             current_room=CHARACTER.room, args=args)
                         create_savepoint(background=True)
                     else:
-                        print("This command is disabled during fights")
+                        print("This command is disabled during fights.")
                     break
             except AttributeError:
                 pass
