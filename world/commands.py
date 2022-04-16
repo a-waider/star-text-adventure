@@ -1,3 +1,4 @@
+from enum import Enum
 import json
 import sys
 
@@ -20,7 +21,7 @@ def help_menu(args: 'list[str]'):
     print("----- Help -----", sleep_time=sleep_time)
     print(
         f"{'Command':20}{'Arguments':19}{'Description':70}{'Aliases':20}", sleep_time=sleep_time)
-    for command in commands:
+    for command in Commands:
         if not bool(CHARACTER.room.npc) or command.available_in_fight:
             print(
                 f"{command.keyword:20}{' '.join([f'<{arg}>' for arg in command.args]):19}\
@@ -340,92 +341,110 @@ def exit_game(args: 'list[str]' = None):
     sys.exit(0)
 
 
-commands: 'list[Command]' = [
-    Command("help",
-            description="Shows this help message",
-            available_in_fight=True,
-            command=help_menu),
-    Command("show statistics",
-            aliases=["show stats"],
-            description="Shows the statistics to your character",
-            available_in_fight=True,
-            command=show_statistics),
-    Command("show inventory",
-            aliases=["show inv"],
-            description="Shows the inventory of your character",
-            available_in_fight=True,
-            command=show_inventory),
-    Command("show health",
-            description="Shows the health of your character",
-            available_in_fight=True,
-            command=show_health),
-    Command("where am i",
-            description="Shows your current room",
-            available_in_fight=True,
-            command=where_am_i),
-    Command("where can i go",
-            description="Shows the rooms you can enter from your current position",
-            command=where_can_i_go),
-    Command("go",
-            args=["room"],
-            description="Move your character to another room",
-            command=go),
-    Command("search room",
-            aliases=["search", "look"],
-            description="Searches the room for loot",
-            command=search_room),
-    Command("buy",
-            args=["item", "amount"],
-            description="Buys an item",
-            valid_rooms=[
-                Rooms.GARAGE.value,
-            ],
-            command=buy),
-    Command("take",
-            args=["item"],
-            description="Takes all items of a kind into the inventory",
-            command=take),
-    Command("drop",
-            args=["item"],
-            description="Drops the item in the current room",
-            command=drop),
-    Command("use",
-            args=["item", "amount"],
-            description="Uses an item from your inventory",
-            available_in_fight=True,
-            command=use),
-    Command("view",
-            args=["map name"],
-            description="Displays the map",
-            command=view),
-    Command("equip",
-            args=["weapon name"],
-            description="Equips a weapon",
-            available_in_fight=True,
-            command=equip),
-    Command("inspect",
-            args=["weapon name"],
-            description="Shows the specs of a equipped weapon or a weapon in your inventory",
-            available_in_fight=True,
-            command=inspect),
-    Command("attack",
-            args=["weapon type"],
-            description="Attacks an enemy. Valid types are \"melee\" or \"ranged\"",
-            available_in_fight=True,
-            command=attack),
-    Command("create savepoint",
-            args=["filename"],
-            aliases=["save"],
-            description="Creates a savepoint",
-            available_in_fight=True,
-            command=create_savepoint),
-    Command("import savepoint",
-            args=["filename"],
-            description="Imports a savepoint",
-            available_in_fight=True,
-            command=import_savepoint),
-    Command("exit",
-            description="Exits the game",
-            available_in_fight=True,
-            command=exit_game)
-]
+class Commands(Enum):
+    HELP: Command = Command(
+        "help",
+        description="Shows this help message",
+        available_in_fight=True,
+        command=help_menu)
+    SHOW_STATISTICS: Command = Command(
+        "show statistics",
+        aliases=["show stats"],
+        description="Shows the statistics to your character",
+        available_in_fight=True,
+        command=show_statistics)
+    SHOW_INVENTORY: Command = Command(
+        "show inventory",
+        aliases=["show inv"],
+        description="Shows the inventory of your character",
+        available_in_fight=True,
+        command=show_inventory)
+    SHOW_HEALTH: Command = Command(
+        "show health",
+        description="Shows the health of your character",
+        available_in_fight=True,
+        command=show_health)
+    WHERE_AM_I: Command = Command(
+        "where am i",
+        description="Shows your current room",
+        available_in_fight=True,
+        command=where_am_i)
+    WHERE_CAN_I_GO: Command = Command(
+        "where can i go",
+        description="Shows the rooms you can enter from your current position",
+        command=where_can_i_go)
+    GO: Command = Command(
+        "go",
+        args=["room"],
+        description="Move your character to another room",
+        command=go)
+    SEARCH_ROOM: Command = Command(
+        "search room",
+        aliases=["search", "look"],
+        description="Searches the room for loot",
+        command=search_room),
+    BUY: Command = Command(
+        "buy",
+        args=["item", "amount"],
+        description="Buys an item",
+        valid_rooms=[
+            Rooms.GARAGE.value,
+        ],
+        command=buy)
+    TAKE: Command = Command(
+        "take",
+        args=["item"],
+        description="Takes all items of a kind into the inventory",
+        command=take)
+    DROP: Command = Command(
+        "drop",
+        args=["item"],
+        description="Drops the item in the current room",
+        command=drop)
+    USE: Command = Command(
+        "use",
+        args=["item", "amount"],
+        description="Uses an item from your inventory",
+        available_in_fight=True,
+        command=use)
+    VIEW: Command = Command(
+        "view",
+        args=["map name"],
+        description="Displays the map",
+        command=view)
+    EQUIP: Command = Command(
+        "equip",
+        args=["weapon name"],
+        description="Equips a weapon",
+        available_in_fight=True,
+        command=equip)
+    INSPECT: Command = Command(
+        "inspect",
+        args=["weapon name"],
+        description="Shows the specs of a equipped weapon or a weapon in your inventory",
+        available_in_fight=True,
+        command=inspect)
+    ATTACK: Command = Command(
+        "attack",
+        args=["weapon type"],
+        description="Attacks an enemy. Valid types are \"melee\" or \"ranged\"",
+        available_in_fight=True,
+        command=attack)
+    CREATE_SAVEPOINT: Command = Command(
+        "create savepoint",
+        args=["filename"],
+        aliases=["save"],
+        description="Creates a savepoint",
+        available_in_fight=True,
+        command=create_savepoint)
+    IMPORT_SAVEPOINT: Command = Command(
+        "import savepoint",
+        args=["filename"],
+        description="Imports a savepoint",
+        available_in_fight=True,
+        command=import_savepoint)
+    EXIT: Command = Command(
+        "exit",
+        description="Exits the game",
+        available_in_fight=True,
+        command=exit_game)

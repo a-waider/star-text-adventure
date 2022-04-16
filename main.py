@@ -6,7 +6,7 @@ import readchar
 
 from classes.person import Person
 from utilities import print
-from world.commands import commands, create_savepoint, import_savepoint
+from world.commands import Commands, create_savepoint, import_savepoint
 from world.items import Items
 from world.rooms import Rooms
 
@@ -67,13 +67,13 @@ def main(test_mode: bool = False, user_commands: 'list[str]' = None):
         else:
             user_input = input("Enter your command: ").strip().lower()
         valid_user_input = False
-        for command in commands:
-            if user_input.startswith(command.keyword) or [alias for alias in command.aliases if user_input.startswith(alias)]:
-                if user_input.startswith(command.keyword):
+        for command in Commands:
+            if user_input.startswith(command.value.keyword) or [alias for alias in command.value.aliases if user_input.startswith(alias)]:
+                if user_input.startswith(command.value.keyword):
                     args = user_input.replace(
-                        command.keyword, "", 1).strip().lower().split(" ")
+                        command.value.keyword, "", 1).strip().lower().split(" ")
                 else:
-                    for alias in command.aliases:
+                    for alias in command.value.aliases:
                         if user_input.startswith(alias):
                             args = user_input.replace(
                                 alias, "", 1).strip().lower().split(" ")
@@ -83,8 +83,9 @@ def main(test_mode: bool = False, user_commands: 'list[str]' = None):
                 except ValueError:
                     pass
                 valid_user_input = True
-                if not bool(CHARACTER.room.npc) or command.available_in_fight:
-                    command.run_command(current_room=CHARACTER.room, args=args)
+                if not bool(CHARACTER.room.npc) or command.value.available_in_fight:
+                    command.value.run_command(
+                        current_room=CHARACTER.room, args=args)
                     create_savepoint(background=True)
                 else:
                     print("This command is disabled during fights")
