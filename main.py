@@ -21,6 +21,8 @@ CHARACTER.ranged_weapon = None
 
 
 def handler(signum, frame):
+    # pylint: disable=unused-argument
+
     msg = "\nCtrl-c was pressed. Do you really want to exit? (y)"
     print(msg)
     res = readchar.readchar()
@@ -53,7 +55,7 @@ def main(test_mode: bool = False, user_commands: 'list[str]' = None):
                     "You wake up in your bed from a nightmare.",
                     "Everything is still so fuzzy so you can't really see your surroundings."
                 ])
-                print("To get an overview over the available commands type: \"help\"")
+                CHARACTER.room.enter_room_function()
 
     while True:
         if TEST_MODE[0]:

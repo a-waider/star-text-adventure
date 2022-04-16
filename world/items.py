@@ -16,6 +16,7 @@ def armor(amount: int):
     if amount <= CHARACTER.inventory[Items.ARMOR.value]:
         CHARACTER.inventory.remove_item(Items.ARMOR.value, amount=amount)
         CHARACTER.armor += amount
+        print(f"You have now {CHARACTER.armor} {Items.ARMOR.value}.")
     else:
         print("You don't have enough Armor in your inventory.")
 
@@ -27,6 +28,8 @@ def arrow(amount: int):
         if CHARACTER.ranged_weapon:
             CHARACTER.inventory.remove_item(Items.ARROW.value, amount=amount)
             CHARACTER.ranged_weapon.ammunition += amount
+            print(
+                f"You now have {CHARACTER.ranged_weapon.ammunition} ammunition in your {CHARACTER.ranged_weapon}.")
         else:
             print("You don't have a ranged weapon equipped.")
     else:
@@ -63,6 +66,7 @@ def lockpicker(amount: int):
 
     if CHARACTER.room == Rooms.FRONT_YARD.value:
         Rooms.GARAGE.value.locked = False
+        CHARACTER.inventory.remove_item(Items.LOCKPICKER.value)
         print("The garage door has been unlocked")
     else:
         print("The Lockpicker doesn't work in this room")
@@ -91,7 +95,7 @@ def map_home():
 {" "*ROOM_NAME_LENGTH}    {"|".center(ROOM_NAME_LENGTH)}
 {" "*ROOM_NAME_LENGTH}    {"|".center(ROOM_NAME_LENGTH)}
 {" "*ROOM_NAME_LENGTH}    {_room_string(Rooms.FRONT_YARD.value)}
-""")
+""", sleep_time=0.0001)
 
 
 def map_street():
@@ -105,7 +109,7 @@ def map_street():
 {" "*ROOM_NAME_LENGTH}    {"|".center(ROOM_NAME_LENGTH)}
 {" "*ROOM_NAME_LENGTH}    {"|".center(ROOM_NAME_LENGTH)}
 {" "*ROOM_NAME_LENGTH}    {_room_string(Rooms.PRINCESS_MAGDALENA_GARDEN.value)}
-""")
+""", sleep_time=0.0001)
 
 
 class Items(Enum):

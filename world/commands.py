@@ -40,13 +40,16 @@ def show_statistics(args: 'list[str]'):
 def show_inventory(args: 'list[str]'):
     from main import CHARACTER
 
-    print(f"----- {trailing_s(CHARACTER)} Inventory -----")
-    print(f"Melee weapon: {CHARACTER.melee_weapon}")
+    sleep_time = 0.001
+    print(f"----- {trailing_s(CHARACTER)} Inventory -----",
+          sleep_time=sleep_time)
+    print(f"Melee weapon: {CHARACTER.melee_weapon}", sleep_time=sleep_time)
     if CHARACTER.ranged_weapon:
-        print(f"Ranged weapon: {CHARACTER.ranged_weapon}")
+        print(f"Ranged weapon: {CHARACTER.ranged_weapon}",
+              sleep_time=sleep_time)
     for item, amount in CHARACTER.inventory.items():
-        print(f"{item.__str__(amount=amount)}")
-    print("-----")
+        print(f"{item.__str__(amount=amount)}", sleep_time=sleep_time)
+    print("-----", sleep_time=sleep_time)
 
 
 def show_health(args: 'list[str]'):
@@ -72,13 +75,7 @@ def buy(args: 'list[str]'):
         cost = CHARACTER.room.items_to_buy[item]
         if Items.COIN.value in CHARACTER.inventory.keys() and CHARACTER.inventory[Items.COIN.value] >= amount*cost:
             CHARACTER.inventory.remove_item(Items.COIN.value, amount*cost)
-            if CHARACTER.inventory.add_item(item, amount):
-                if amount > 1:
-                    print(
-                        f"{item.__str__(amount=amount)} have been added your inventory")
-                else:
-                    print(
-                        f"{item.__str__(amount=amount)} has been added your inventory")
+            CHARACTER.inventory.add_item(item, amount)
         else:
             print("You don't have enough coins in your inventory")
     else:
@@ -96,6 +93,8 @@ def take(args: 'list[str]'):
         amount = CHARACTER.room.loot[item]
         if CHARACTER.inventory.add_item(item, amount):
             CHARACTER.room.loot.remove_item(item, amount)
+        else:
+            CHARACTER.room.loot.remove_item(item, amount)
     else:
         print("This item does not exist")
 
@@ -107,8 +106,15 @@ def drop(args: 'list[str]'):
 
     item_name = " ".join(args)
     item = Items.get_item_by_name(item_name)
-    amount = CHARACTER.inventory[item]
-    CHARACTER.inventory.remove_item(item_name, amount)
+    if item in CHARACTER.inventory:
+        amount = CHARACTER.inventory[item]
+    elif item.name in (CHARACTER.melee_weapon.name,  CHARACTER.ranged_weapon.name):
+        amount = 1
+    else:
+        print("You can't drop an item you don't have in your inventory")
+        return
+    if CHARACTER.inventory.remove_item(item, amount):
+        CHARACTER.room.loot.add_item(item, amount)
     print(f"Dropped {item.__str__(amount=amount)} in {CHARACTER.room}")
 
 
@@ -221,7 +227,7 @@ def inspect(args: 'list[str]'):
         print(f"Base damage: {weapon.base_damage}")
         print(f"Damage variation: {weapon.damage_variation}")
         if isinstance(weapon, WeaponRanged):
-            print(f"Ammunition: {weapon.ammunition}")
+            print(f"Ammunition: {CHARACTER.ranged_weapon.ammunition}")
         print("-----")
     else:
         print("You don't have this weapon equipped or in your inventory")

@@ -8,12 +8,59 @@ from utilities import print
 from world.items import Items
 
 
+def bedroom():
+    if not Rooms.BEDROOM.value.visited:
+        print([
+            f"Let's start by finding out where you can go. Type \"where can i go\" and go there with e.g. \"go {Rooms.CORRIDOR.value.name}\""
+        ])
+
+
+def corridor():
+    from main import CHARACTER
+
+    if not Rooms.CORRIDOR.value.visited:
+        print([
+            "Take the map to get an overview where you can go. Don't expect the map to be complete though."
+        ])
+        if not CHARACTER.inventory.add_item(Items.MAP_HOME.value):
+            CHARACTER.room.loot.add_item(Items.MAP_HOME.value)
+            print([
+                f"The item still lies in the {Rooms.CORRIDOR.value}. You need to drop an item before you can take the map."
+            ])
+        else:
+            print([
+                f"Type \"view {Items.MAP_HOME.value.name}\" to view the map"
+            ])
+
+    if Items.KEY_HOME.value in CHARACTER.inventory.keys():
+        print([
+            f"You can open the door by using the key like this: \"use {Items.KEY_HOME.value.name}\""
+        ])
+
+
+def lounge():
+    if len(Rooms.LOUNGE.value.loot) > 0:
+        print([
+            f"Look around you! Did you notice the items lying around? Type \"search room\", \"search\" or \"look\" and take the item with e.g. \"take {list(Rooms.LOUNGE.value.loot.keys())[0].name}\".",
+            "Maybe there are more items in the other rooms."
+        ])
+
+
 def kitchen():
-    print([
-        "You just killed your own wife!",
-        "You're realizing that either you're still caught in a really bad dream or the zombie apocalypse became real.",
-        "Either way, you have to get through it and survive as long as you can."
-    ])
+    if not Rooms.KITCHEN.value.visited:
+        print([
+            "You just killed your own wife!",
+            "You're realizing that either you're still caught in a really bad dream or the zombie apocalypse became real.",
+            "Either way, you have to get through it and survive as long as you can."
+        ])
+
+
+def front_yard():
+    if not Rooms.FRONT_YARD.value.visited:
+        print([
+            "To get an overview over the other available commands type: \"help\"",
+            "You should get along with this menu by your own now."
+        ])
 
 
 def gravestone():
@@ -29,13 +76,22 @@ def neighbor_joe():
     from main import CHARACTER
 
     print([
-        "You enter the house of your neighbor and see him coverd in blood lying on the floor",
-        f"Neighbor: \"{CHARACTER}! Good you're still alive. Zombies attacked and raided my house.\"",
+        "You enter the house of your neighbor and see him coverd in blood lying on the floor.",
+        f"Neighbor: \"{CHARACTER}! Good, you're still alive. Zombies attacked me and raided my house.\"",
         "You: \"Yes my wife also turned into a Zombie. I needed to kill her to survive.\"",
-        "Neighbor: \"I was able to protect this map of the streets from the Zombies. Hopefully it can help you to stay alive and stop the zombie apocalypse. My fight is over, good luck.\"",
-        f"There is nothing you can do to help your neighbor. His injuries are too bad. Type \"view {Items.MAP_STREET.value}\" to view the map"])
-
-    CHARACTER.inventory.add_item(Items.MAP_STREET.value)
+        "Neighbor: \"Oh no. I'm glad you're still at good health. I was able to protect this map of the streets from the Zombies. Hopefully it can help you to stay alive and stop the zombie apocalypse. My fight is over, good luck.\"",
+        "There is nothing you can do to help your neighbor. His injuries are too bad."
+    ])
+    if not CHARACTER.inventory.add_item(Items.MAP_STREET.value):
+        CHARACTER.room.loot.add_item(Items.MAP_STREET.value)
+        print([
+            "The item still lies in the house. You need to drop an item before you can take the map.",
+            f"Then view the map by typing: \"view {Items.MAP_STREET.value.name}\""
+        ])
+    else:
+        print([
+            f"Type \"view {Items.MAP_STREET.value.name}\" to view the map"
+        ])
 
 
 class Rooms(Enum):
@@ -43,10 +99,10 @@ class Rooms(Enum):
     BEDROOM: Room = Room(
         name="Bedroom",
         loot=Inventory({
-            Items.MAP_HOME.value: 1
+            Items.COIN.value: 4
         }),
-        visited=True,
-        respawn_point=True)
+        respawn_point=True,
+        enter_room_function=bedroom)
     KITCHEN: Room = Room(
         name="Kitchen",
         npc=NPC(
@@ -63,12 +119,11 @@ class Rooms(Enum):
         loot=Inventory({
             Items.LOCKPICKER.value: 1,
             Items.COIN.value: 3
-        }))
+        }),
+        enter_room_function=lounge)
     CORRIDOR: Room = Room(
         name="Corridor",
-        loot=Inventory({
-            Items.COIN.value: 5
-        }))
+        enter_room_function=corridor)
     LIVING_ROOM: Room = Room(
         name="Living Room",
         lock_message=None,

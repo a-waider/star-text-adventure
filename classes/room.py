@@ -71,10 +71,6 @@ class Room:
     def enter_room(self):
         from main import CHARACTER
 
-        if not self.visited and CHARACTER.respawn_point:
-            CHARACTER.respawn_point = self
-            print("Your respawn point has been updated.")
-        self.visited = True
         if self.locked and self.lock_message:
             print(f"{self.lock_message}\n")
             return
@@ -86,6 +82,10 @@ class Room:
         if self.enter_room_function:
             self.enter_room_function()
         print(f"You are now in {self}.")
+        if not self.visited and CHARACTER.room.respawn_point:
+            CHARACTER.respawn_point = self
+            print("Your respawn point has been updated.")
+        self.visited = True
         if self.items_to_buy:
             print(self.buy_menu(), sleep_time=0.0001)
 

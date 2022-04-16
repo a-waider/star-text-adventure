@@ -28,7 +28,10 @@ class Item:
         from main import CHARACTER
 
         if self.use_function:
-            self.use_function(amount=amount)
+            try:
+                self.use_function(amount=amount)
+            except TypeError:
+                print("You can't use this item.")
         else:
             raise UseFunctionNotDefined
 
