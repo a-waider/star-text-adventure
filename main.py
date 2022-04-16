@@ -11,6 +11,7 @@ from world.items import Items
 from world.rooms import Rooms
 
 DEFAULT_SAVEPOINT_FILENAME = "savepoint.json"
+TEST_MODE = [False]
 
 CHARACTER = Person(
     name="",
@@ -40,7 +41,8 @@ signal.signal(signal.SIGINT, handler)
 def main(test_mode: bool = False, user_commands: 'list[str]' = None):
     from main import CHARACTER
 
-    if not test_mode:
+    TEST_MODE[0] = test_mode
+    if not TEST_MODE[0]:
         if os.path.isfile(DEFAULT_SAVEPOINT_FILENAME):
             import_savepoint()
         else:
@@ -54,7 +56,7 @@ def main(test_mode: bool = False, user_commands: 'list[str]' = None):
                 print("To get an overview over the available commands type: \"help\"")
 
     while True:
-        if test_mode:
+        if TEST_MODE[0]:
             if user_commands:
                 user_input = user_commands.pop(0)
                 print(f"executing command: {user_input}")

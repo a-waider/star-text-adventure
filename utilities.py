@@ -4,21 +4,24 @@ from typing import Tuple
 
 def print(text: 'list[str]' = "", sleep_time: int = 0.01):
     from builtins import print
+    from main import TEST_MODE
 
-    def text_print(text: str, sleep_time: int = 0.01):
+    def text_print(text: str):
         for character in text:
             print(character, end="")
-            time.sleep(sleep_time)
+            if not TEST_MODE[0]:
+                time.sleep(sleep_time)
 
     if isinstance(text, list):
         for sentence in text:
-            text_print(sentence, sleep_time=sleep_time)
-            input(" <enter>")
+            text_print(sentence)
+            if not TEST_MODE[0]:
+                input(" <enter>")
     elif isinstance(text, str):
-        text_print(text, sleep_time=sleep_time)
+        text_print(text)
         print()
     else:
-        raise Exception
+        text_print(str(text))
 
 
 def trailing_s(name: str) -> str:
