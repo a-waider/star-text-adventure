@@ -74,24 +74,26 @@ def neighbor_joe():
     # pylint: disable=line-too-long
 
     from main import CHARACTER
-
-    print([
-        "You enter the house of your neighbor and see him coverd in blood lying on the floor.",
-        f"Neighbor: \"{CHARACTER}! Good, you're still alive. Zombies attacked me and raided my house.\"",
-        "You: \"Yes my wife also turned into a Zombie. I needed to kill her to survive.\"",
-        "Neighbor: \"Oh no. I'm glad you're still at good health. I was able to protect this map of the streets from the Zombies. Hopefully it can help you to stay alive and stop the zombie apocalypse. My fight is over, good luck.\"",
-        "There is nothing you can do to help your neighbor. His injuries are too bad."
-    ])
-    if not CHARACTER.inventory.add_item(Items.MAP_STREET.value):
-        CHARACTER.room.loot.add_item(Items.MAP_STREET.value)
+    if not Rooms.NEIGHBOR_JOES_HOUSE.value.visited:
         print([
-            "The item still lies in the house. You need to drop an item before you can take the map.",
-            f"Then view the map by typing: \"view {Items.MAP_STREET.value.name}\""
+            "You enter the house of your neighbor and see him coverd in blood lying on the floor.",
+            f"Neighbor: \"{CHARACTER}! Good, you're still alive. Zombies attacked me and raided my house.\"",
+            "You: \"Yes my wife also turned into a Zombie. I needed to kill her to survive.\"",
+            "Neighbor: \"Oh no. I'm glad you're still at good health. I was able to protect this map of the streets from the zombies. Hopefully it can help you to stay alive and stop the zombie apocalypse. My fight is over, good luck.\"",
+            "There is nothing you can do to help your neighbor. His injuries are too bad.",
+            "You stab a knife in his head to stop him from turning into a zombie."
         ])
-    else:
-        print([
-            f"Type \"view {Items.MAP_STREET.value.name}\" to view the map"
-        ])
+        CHARACTER.kills += 1
+        if not CHARACTER.inventory.add_item(Items.MAP_STREET.value):
+            CHARACTER.room.loot.add_item(Items.MAP_STREET.value)
+            print([
+                "The item still lies in the house. You need to drop an item before you can take the map.",
+                f"Then view the map by typing: \"view {Items.MAP_STREET.value.name}\""
+            ])
+        else:
+            print([
+                f"Type \"view {Items.MAP_STREET.value.name}\" to view the map"
+            ])
 
 
 class Rooms(Enum):
@@ -138,14 +140,14 @@ class Rooms(Enum):
     GARAGE: Room = Room(
         name="Garage",
         locked=True,
-        lock_message="You couldn't find any key for the garage. It must opens differently...",
+        lock_message="You couldn't find any key for the garage. It has to open up differently...",
         loot=Inventory({
-            Items.BOW.value: 1,
+            Items.GUN.value: 1,
             Items.COIN.value: 10,
         }),
         items_to_buy=Inventory({
             Items.ARMOR.value: 1,
-            Items.ARROW.value: 2,
+            Items.BULLET_MAGAZINE.value: 2,
             Items.HEALING_POTION.value: 5,
         }))
     GRAVESTONE: Room = Room(
@@ -165,13 +167,13 @@ class Rooms(Enum):
             loot=Inventory({
                 Items.COIN.value: 3
             })))
-    NEIGHBOR_JOE: Room = Room(
-        name="Neighbor Joe",
+    NEIGHBOR_JOES_HOUSE: Room = Room(
+        name="Neighbor Joe's house",
         enter_room_function=neighbor_joe)
-    CREAPY_NEIGHBOR: Room = Room(
-        name="Creapy Neighbor",
+    CREEPY_NEIGHBORS_HOUSE: Room = Room(
+        name="Creepy neighbor's house",
         npc=NPC(
-            name="Creapy zombie neighbor",
+            name="Creepy zombie neighbor",
             max_health=40,
             base_damage=6,
             krit_damage=10,
@@ -228,8 +230,8 @@ room_connections: 'list[list[Room]]' = [
     [Rooms.FRONT_YARD.value, Rooms.CANAL_STREET.value],
 
     # World 2
-    [Rooms.CANAL_STREET.value, Rooms.NEIGHBOR_JOE.value],
-    [Rooms.CANAL_STREET.value, Rooms.CREAPY_NEIGHBOR.value],
+    [Rooms.CANAL_STREET.value, Rooms.NEIGHBOR_JOES_HOUSE.value],
+    [Rooms.CANAL_STREET.value, Rooms.CREEPY_NEIGHBORS_HOUSE.value],
     [Rooms.CANAL_STREET.value, Rooms.PRINCESS_MAGDALENA_GARDEN.value],
     [Rooms.CANAL_STREET.value, Rooms.MONTANA_AVENUE.value]
 ]

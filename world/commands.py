@@ -22,10 +22,10 @@ def help_menu(args: 'list[str]'):
     print(
         f"{'Command':20}{'Arguments':19}{'Description':70}{'Aliases':20}", sleep_time=sleep_time)
     for command in Commands:
-        if not bool(CHARACTER.room.npc) or command.available_in_fight:
+        if not bool(CHARACTER.room.npc) or command.value.available_in_fight:
             print(
-                f"{command.keyword:20}{' '.join([f'<{arg}>' for arg in command.args]):19}\
-                    {command.description:70}{', '.join(command.aliases):20}", sleep_time=sleep_time)
+                f"{command.value.keyword:20}{' '.join([f'<{arg}>' for arg in command.value.args]):19}\
+                    {command.value.description:70}{', '.join(command.value.aliases):20}", sleep_time=sleep_time)
     print("-----", sleep_time=sleep_time)
 
 
@@ -53,7 +53,7 @@ def show_inventory(args: 'list[str]'):
     print("-----", sleep_time=sleep_time)
 
 
-def show_health(args: 'list[str]'):
+def show_health(args: 'list[str]' = None):
     from main import CHARACTER
 
     print(f"----- {trailing_s(CHARACTER)} Health -----")
@@ -78,9 +78,9 @@ def buy(args: 'list[str]'):
             CHARACTER.inventory.remove_item(Items.COIN.value, amount*cost)
             CHARACTER.inventory.add_item(item, amount)
         else:
-            print("You don't have enough coins in your inventory")
+            print("You don't have enough coins in your inventory.")
     else:
-        print("This item can't be bought")
+        print("This item can't be bought.")
 
 
 def take(args: 'list[str]'):
@@ -97,7 +97,7 @@ def take(args: 'list[str]'):
         else:
             CHARACTER.room.loot.remove_item(item, amount)
     else:
-        print("This item does not exist")
+        print("This item doesn't exist in this room.")
 
 
 def drop(args: 'list[str]'):
@@ -125,6 +125,8 @@ def search_room(args: 'list[str]'):
     loot: 'dict[Item]' = CHARACTER.room.loot
     for loot_item, amount in loot.items():
         print(loot_item.__str__(amount=amount))
+    if not loot:
+        print("This room is empty.")
 
 
 def use(args: 'list[str]'):
@@ -161,7 +163,7 @@ def view(args: 'list[str]'):
 def where_am_i(args: 'list[str]'):
     from main import CHARACTER
 
-    print(f"You are in {CHARACTER.room}")
+    print(f"You are in {CHARACTER.room}.")
 
 
 def where_can_i_go(args: 'list[str]'):
@@ -185,7 +187,7 @@ def go(args: 'list[str]'):
                 CHARACTER.room = next_room
                 CHARACTER.room.enter_room()
             return
-    print("You can't go in this room")
+    print("You can't go in this room.")
 
 
 def equip(args: 'list[str]'):
@@ -226,6 +228,7 @@ def inspect(args: 'list[str]'):
     if weapon and weapon.name in weapons:
         print(f"----- {weapon} -----")
         print(f"Base damage: {weapon.base_damage}")
+        # TODO: Maybe rename to krit damage
         print(f"Damage variation: {weapon.damage_variation}")
         if isinstance(weapon, WeaponRanged):
             print(f"Ammunition: {CHARACTER.ranged_weapon.ammunition}")
@@ -256,16 +259,18 @@ def attack(args: 'list[str]'):
                 print("You don't have a ranged weapon")
                 return
         else:
-            print("You must define which weapon you want to use.")
+            print(
+                "You must define which weapon type you want to use. Valid types are \"melee\" and \"ranged\".")
             return
         npc_attack_damage = npc.attack()
         npc.defend(character_attack_damage)
         CHARACTER.defend(npc_attack_damage)
         if npc.health <= 0:
-            print(f"You defeated {npc}")
+            CHARACTER.kills += 1
             print(f"----- {CHARACTER} ----")
             print(CHARACTER.fighting_stats())
             print("-----")
+            print(f"You defeated {npc}")
             new_items_string = ""
             for item, amount in npc.loot.items():
                 if item == list(npc.loot.keys())[0]:
@@ -331,7 +336,7 @@ def import_savepoint(args: 'list[str]' = None):
         print(f"\"{filename}\" does not exist")
 
     print(
-        f"Successfully importet savepoint from \"{filename}\". Welcome back, {CHARACTER.name}. You are now in {CHARACTER.room}.")
+        f"Successfully importet savepoint from \"{filename}\". Welcome back, {CHARACTER.name}.")
     CHARACTER.room.enter_room()
 
 
@@ -382,7 +387,7 @@ class Commands(Enum):
         "search room",
         aliases=["search", "look"],
         description="Searches the room for loot",
-        command=search_room),
+        command=search_room)
     BUY: Command = Command(
         "buy",
         args=["item", "amount"],

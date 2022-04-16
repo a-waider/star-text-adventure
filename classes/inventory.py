@@ -28,6 +28,8 @@ class Inventory(dict):
 
         if item in self:
             self[item] += amount
+            print(
+                f"Added {item.__str__(amount=amount)} to your inventory.")
             return True
         else:
             if self.max_items is None or (self.max_items is not None and len(self) < self.max_items):

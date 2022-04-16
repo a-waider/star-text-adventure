@@ -18,7 +18,7 @@ class Person:
             max_health: int = 100,
             luck: int = random.randint(1, 10),
             armor: int = 0,
-            melee_weapon: WeaponMelee = Items.FIST.value,
+            melee_weapon: WeaponMelee = Items.REMOTE.value,
             ranged_weapon: WeaponRanged = None,
             inventory: 'Inventory[Item,int]' = None,
             max_inventory_items: int = 10,

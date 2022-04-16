@@ -24,9 +24,10 @@ def armor(amount: int):
 def arrow(amount: int):
     from main import CHARACTER
 
-    if amount <= CHARACTER.inventory[Items.ARROW.value]:
+    if amount <= CHARACTER.inventory[Items.BULLET_MAGAZINE.value]:
         if CHARACTER.ranged_weapon:
-            CHARACTER.inventory.remove_item(Items.ARROW.value, amount=amount)
+            CHARACTER.inventory.remove_item(
+                Items.BULLET_MAGAZINE.value, amount=amount)
             CHARACTER.ranged_weapon.ammunition += amount
             print(
                 f"You now have {CHARACTER.ranged_weapon.ammunition} ammunition in your {CHARACTER.ranged_weapon}.")
@@ -38,12 +39,14 @@ def arrow(amount: int):
 
 def healing_potion(amount: int):
     from main import CHARACTER
+    from commands import show_health
 
     gained_health_per_potion = 25
 
     CHARACTER.inventory.remove_item(Items.HEALING_POTION.value, amount=amount)
     CHARACTER.add_health(amount*gained_health_per_potion)
-    print(f"You regained {amount*gained_health_per_potion} health")
+    print(f"You regained {amount*gained_health_per_potion} health.")
+    show_health()
 
 
 def key_front_door(amount: int):
@@ -102,7 +105,7 @@ def map_street():
     from world.rooms import Rooms
 
     print(f"""
-{" "*int(0.6*ROOM_NAME_LENGTH)}  {_room_string(Rooms.NEIGHBOR_JOE.value)}  {_room_string(Rooms.CREAPY_NEIGHBOR.value)}
+{" "*int(0.6*ROOM_NAME_LENGTH)}  {_room_string(Rooms.NEIGHBOR_JOES_HOUSE.value)}  {_room_string(Rooms.CREEPY_NEIGHBORS_HOUSE.value)}
 {" "*int(1.35*ROOM_NAME_LENGTH)}\\ {"".center(int(ROOM_NAME_LENGTH/2))} /
 {" "*int(1.35*ROOM_NAME_LENGTH)} \\{"".center(int(ROOM_NAME_LENGTH/2))}/
 {_room_string(Rooms.FRONT_YARD.value)} -- {_room_string(Rooms.CANAL_STREET.value)} -- {_room_string(Rooms.MONTANA_AVENUE.value)}
@@ -124,9 +127,9 @@ class Items(Enum):
         icon="🛡",
         use_function=armor,
         use_on_pickup=True)
-    ARROW: Item = Item(
-        name="Arrow",
-        plural="Arrows",
+    BULLET_MAGAZINE: Item = Item(
+        name="Bullet cartridge",
+        plural="Bullet cartridges",
         use_function=arrow)
     HEALING_POTION: Item = Item(
         name="Healing potion",
@@ -155,8 +158,8 @@ class Items(Enum):
         view_function=map_street)
 
     # Weapons
-    FIST: WeaponMelee = WeaponMelee(
-        name="Fist",
+    REMOTE: WeaponMelee = WeaponMelee(
+        name="Remote",
         icon="👊",
         base_damage=5,
         damage_variation=1)
@@ -170,12 +173,12 @@ class Items(Enum):
         icon="🪓",
         base_damage=25,
         damage_variation=10)
-    BOW: WeaponRanged = WeaponRanged(
-        name="Bow",
-        icon="🏹",
+    GUN: WeaponRanged = WeaponRanged(
+        name="Gun",
+        icon="🔫",
         base_damage=12,
         damage_variation=15,
-        ammunition=10)
+        ammunition=3)
 
     @ staticmethod
     def get_item_by_name(name: str) -> Item:
