@@ -262,7 +262,7 @@ def attack(args: 'list[str]'):
         print("There are no npc's to fight.")
 
 
-def create_savepoint(args: 'list[str]' = None):
+def create_savepoint(args: 'list[str]' = None, background: bool = False):
     from main import CHARACTER, DEFAULT_SAVEPOINT_FILENAME
 
     filename = " ".join(args) if args else DEFAULT_SAVEPOINT_FILENAME
@@ -272,7 +272,8 @@ def create_savepoint(args: 'list[str]' = None):
     }
     with open(filename, "w") as file:
         file.write(json.dumps(json_output, indent=4, ensure_ascii=True))
-    print(f"Successfully created savepoint at \"{filename}\"")
+    if not background:
+        print(f"Successfully created savepoint at \"{filename}\"")
 
 
 def import_savepoint(args: 'list[str]' = None):

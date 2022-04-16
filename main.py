@@ -76,6 +76,7 @@ def main(test_mode: bool = False, user_commands: 'list[str]' = None):
                 valid_user_input = True
                 if not bool(CHARACTER.room.npc) or command.available_in_fight:
                     command.run_command(current_room=CHARACTER.room, args=args)
+                    create_savepoint(background=True)
                 else:
                     print("This command is disabled during fights")
                 break
