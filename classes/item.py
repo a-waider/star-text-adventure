@@ -11,11 +11,13 @@ class Item:
         self.icon: str = icon
         self.use_function = use_function
 
-    def __str__(self, plural: bool = False):
+    def __str__(self, plural: bool = False, amount: int = 1):
         ret = ""
+        if amount > 1:
+            ret += f"{amount} "
         if self.icon:
             ret += f"{self.icon}  "
-        if plural:
+        if plural or amount > 1:
             ret += colored(self.plural, "yellow")
         else:
             ret += colored(self.name, "yellow")

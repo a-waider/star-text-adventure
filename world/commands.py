@@ -251,10 +251,20 @@ def attack(args: 'list[str]'):
             print(f"----- {CHARACTER} ----")
             print(CHARACTER.fighting_stats())
             print("-----")
+            new_items_string = ""
             for item, amount in npc.loot.items():
+                if item == list(npc.loot.keys())[0]:
+                    new_items_string += item.__str__(amount=amount)
+                elif item == list(npc.loot.keys())[-1]:
+                    new_items_string += f" and {item.__str__(amount=amount)}"
+                else:
+                    new_items_string += f", {item.__str__(amount=amount)}"
                 CHARACTER.add_to_inventory(item, amount, force=True)
             if npc.loot:
-                print("New items in your inventory")
+                if len(list(npc.loot.keys())) > 1 or npc.loot[list(npc.loot.keys())[0]] > 1:
+                    print(f"{new_items_string} have been added your inventory")
+                else:
+                    print(f"{new_items_string} has been added your inventory")
             CHARACTER.room.npc = None
             CHARACTER.room.enter_room()
         elif CHARACTER.health <= 0:
