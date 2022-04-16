@@ -1,3 +1,4 @@
+from classes.inventory import Inventory
 from classes.npc import NPC
 from main import CHARACTER, main
 from world.items import Items
@@ -67,6 +68,26 @@ def test_max_inventory():
     assert CHARACTER.inventory.add_item(Items.ARMOR.value)
     assert CHARACTER.inventory.add_item(Items.COIN.value)
     assert not CHARACTER.inventory.add_item(Items.ARROW.value)
+
+
+def test_npc_loot_drops_in_room_loot_if_inventory_full():
+    CHARACTER.inventory.max_items = 1
+    CHARACTER.inventory.add_item(Items.COIN.value)
+    CHARACTER.room = Rooms.LOUNGE.value
+    Rooms.KITCHEN.value.loot = Inventory()
+    Rooms.KITCHEN.value.npc = NPC(
+        "dummy",
+        health=1,
+        base_damage=3,
+        loot=Inventory({
+            Items.ARMOR.value: 1
+        }))
+    execute_commands(commands=[
+        "go kitchen",
+        "attack melee"
+    ])
+    assert Items.ARMOR.value not in list(CHARACTER.inventory.keys())
+    assert Items.ARMOR.value in list(Rooms.KITCHEN.value.loot.keys())
 
 
 def test_update_respawn_point():
