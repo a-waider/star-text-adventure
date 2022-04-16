@@ -27,10 +27,39 @@ def test_cant_go_to_locked_room():
     Rooms.FRONT_YARD.value.locked = True
     CHARACTER.room = Rooms.CORRIDOR.value
     execute_commands(commands=[
-        "go garden"
+        f"go {Rooms.FRONT_YARD.value.name}"
     ])
     assert CHARACTER.room == Rooms.CORRIDOR.value
     assert Rooms.FRONT_YARD.value.locked is True
+
+
+def test_take_item():
+    Rooms.CORRIDOR.value.loot = Inventory({
+        Items.COIN.value: 1
+    })
+    CHARACTER.room = Rooms.CORRIDOR.value
+    CHARACTER.inventory = Inventory()
+    execute_commands(commands=[
+        "take coin"
+    ])
+    assert Items.COIN.value in CHARACTER.inventory
+
+
+def test_drop_item():
+    Rooms.CORRIDOR.value.loot = Inventory({
+        Items.COIN.value: 1
+    })
+    CHARACTER.room = Rooms.CORRIDOR.value
+    CHARACTER.inventory = Inventory(
+        inventory={
+            Items.ARMOR.value: 1
+        },
+        max_items=1)
+    execute_commands(commands=[
+        "take coin"
+    ])
+    assert Items.COIN.value not in CHARACTER.inventory
+    assert Items.COIN.value in CHARACTER.room.loot
 
 
 def test_equip_melee_weapon():

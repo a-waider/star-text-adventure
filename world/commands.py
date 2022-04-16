@@ -19,11 +19,12 @@ def help_menu(args: 'list[str]'):
     sleep_time = 0.0001
     print("----- Help -----", sleep_time=sleep_time)
     print(
-        f"{'Command':20}{'Arguments':19}: {'Description':70}{'Aliases':20}", sleep_time=sleep_time)
+        f"{'Command':20}{'Arguments':19}{'Description':70}{'Aliases':20}", sleep_time=sleep_time)
     for command in commands:
         if not bool(CHARACTER.room.npc) or command.available_in_fight:
             print(
-                f"{command.keyword:20}{' '.join(command.args):19}: {command.description:70}{', '.join(command.aliases):20}", sleep_time=sleep_time)
+                f"{command.keyword:20}{' '.join([f'<{arg}>' for arg in command.args]):19}\
+                    {command.description:70}{', '.join(command.aliases):20}", sleep_time=sleep_time)
     print("-----", sleep_time=sleep_time)
 
 
@@ -71,12 +72,13 @@ def buy(args: 'list[str]'):
         cost = CHARACTER.room.items_to_buy[item]
         if Items.COIN.value in CHARACTER.inventory.keys() and CHARACTER.inventory[Items.COIN.value] >= amount*cost:
             CHARACTER.inventory.remove_item(Items.COIN.value, amount*cost)
-            CHARACTER.inventory.add_item(item, amount)
-            if amount == 1:
-                print(f"{item} has been added to your inventory.")
-            else:
-                print(
-                    f"{amount} {item.__str__(plural=True)} have been added to your inventory.")
+            if CHARACTER.inventory.add_item(item, amount):
+                if amount > 1:
+                    print(
+                        f"{item.__str__(amount=amount)} have been added your inventory")
+                else:
+                    print(
+                        f"{item.__str__(amount=amount)} has been added your inventory")
         else:
             print("You don't have enough coins in your inventory")
     else:
@@ -92,10 +94,22 @@ def take(args: 'list[str]'):
     item = Items.get_item_by_name(item_name)
     if item in CHARACTER.room.loot.keys():
         amount = CHARACTER.room.loot[item]
-        CHARACTER.room.loot.pop(item, None)
-        CHARACTER.inventory.add_item(item, amount)
+        if CHARACTER.inventory.add_item(item, amount):
+            CHARACTER.room.loot.remove_item(item, amount)
     else:
         print("This item does not exist")
+
+
+def drop(args: 'list[str]'):
+    from main import CHARACTER
+
+    from world.items import Items
+
+    item_name = " ".join(args)
+    item = Items.get_item_by_name(item_name)
+    amount = CHARACTER.inventory[item]
+    CHARACTER.inventory.remove_item(item_name, amount)
+    print(f"Dropped {item.__str__(amount=amount)} in {CHARACTER.room}")
 
 
 def search_room(args: 'list[str]'):
@@ -255,11 +269,6 @@ def attack(args: 'list[str]'):
                     new_items_string += f", {item.__str__(amount=amount)}"
                 if not CHARACTER.inventory.add_item(item, amount):
                     CHARACTER.room.loot.add_item(item, amount)
-            if npc.loot:
-                if len(list(npc.loot.keys())) > 1 or npc.loot[list(npc.loot.keys())[0]] > 1:
-                    print(f"{new_items_string} have been added your inventory")
-                else:
-                    print(f"{new_items_string} has been added your inventory")
             CHARACTER.room.npc = None
             CHARACTER.room.enter_room()
         elif CHARACTER.health <= 0:
@@ -370,9 +379,14 @@ commands: 'list[Command]' = [
             args=["item"],
             description="Takes all items of a kind into the inventory",
             command=take),
+    Command("drop",
+            args=["item"],
+            description="Drops the item in the current room",
+            command=drop),
     Command("use",
             args=["item", "amount"],
             description="Uses an item from your inventory",
+            available_in_fight=True,
             command=use),
     Command("view",
             args=["map name"],
