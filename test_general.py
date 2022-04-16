@@ -138,6 +138,16 @@ def test_buy_item():
     assert Items.ARMOR.value in CHARACTER.inventory
 
 
+def test_use_on_pickup():
+    CHARACTER.room = Rooms.GARAGE.value
+    CHARACTER.inventory.add_item(Items.COIN.value, 100)
+    assert CHARACTER.armor == 0
+    execute_commands(commands=[
+        f"buy {Items.ARMOR.value.name}"
+    ])
+    assert CHARACTER.armor == 1
+
+
 def test_buy_multiple_items(items_to_buy: int = 5,):
     CHARACTER.room = Rooms.GARAGE.value
     CHARACTER.inventory.add_item(Items.COIN.value, items_to_buy*100)

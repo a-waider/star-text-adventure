@@ -33,8 +33,11 @@ class Inventory(dict):
             if self.max_items is None or (self.max_items is not None and len(self) < self.max_items):
                 self[item] = amount
                 if self == CHARACTER.inventory:
-                    print(
-                        f"Added {item.__str__(amount=amount)} to your inventory.")
+                    if item.use_on_pickup:
+                        item.use(amount)
+                    else:
+                        print(
+                            f"Added {item.__str__(amount=amount)} to your inventory.")
                 return True
             if self == CHARACTER.inventory:
                 print(

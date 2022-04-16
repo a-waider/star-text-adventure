@@ -6,11 +6,18 @@ from utilities import print
 
 
 class Item:
-    def __init__(self, name: str, plural: str = "", icon: str = "", use_function=lambda: None):
+    def __init__(
+            self,
+            name: str,
+            plural: str = "",
+            icon: str = "",
+            use_function=lambda: None,
+            use_on_pickup: bool = False):
         self.name: str = name
         self.plural: str = plural
         self.icon: str = icon
         self.use_function = use_function
+        self.use_on_pickup: bool = use_on_pickup
 
     def __str__(self, plural: bool = False, amount: int = 1):
         ret = ""

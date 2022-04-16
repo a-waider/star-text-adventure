@@ -122,7 +122,8 @@ class Items(Enum):
         name="Armor",
         plural="Armor",
         icon="🛡",
-        use_function=armor)
+        use_function=armor,
+        use_on_pickup=True)
     ARROW: Item = Item(
         name="Arrow",
         plural="Arrows",
