@@ -15,7 +15,7 @@ def test_unlock_front_door():
     execute_commands(commands=[
         "use key front door"
     ])
-    assert not Rooms.FRONT_YARD.value.locked is False
+    assert Rooms.FRONT_YARD.value.locked is False
     execute_commands(commands=[
         "go front yard"
     ])
@@ -54,11 +54,12 @@ def test_equip_ranged_weapon():
 
 
 def test_use_armor():
-    CHARACTER.add_to_inventory(Items.ARMOR.value, 5)
+    CHARACTER.add_to_inventory(Items.ARMOR.value)
+    assert CHARACTER.armor == 0
     execute_commands(commands=[
         "use armor"
     ])
-    assert CHARACTER.armor == 5
+    assert CHARACTER.armor == 1
 
 
 def test_update_respawn_point():
@@ -77,6 +78,18 @@ def test_buy_item():
     execute_commands(commands=[
         "buy armor"
     ])
+    assert Items.ARMOR.value in CHARACTER.inventory
+
+
+def test_buy_multiple_items(items_to_buy: int = 5,):
+    CHARACTER.room = Rooms.GARAGE.value
+    CHARACTER.add_to_inventory(Items.COIN.value, items_to_buy*100)
+    execute_commands(commands=[
+        f"buy armor {items_to_buy}"
+    ])
+    assert CHARACTER.inventory[Items.ARMOR.value] == items_to_buy
+    assert CHARACTER.inventory[Items.COIN.value] == items_to_buy*100 - \
+        items_to_buy * Rooms.GARAGE.value.items_to_buy[Items.ARMOR.value]
     assert Items.ARMOR.value in CHARACTER.inventory
 
 
