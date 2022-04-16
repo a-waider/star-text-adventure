@@ -11,7 +11,7 @@ def execute_commands(commands: 'list[str]'):
 def test_unlock_front_door():
     Rooms.FRONT_YARD.value.locked = True
     CHARACTER.room = Rooms.CORRIDOR.value
-    CHARACTER.add_to_inventory(Items.KEY_HOME.value)
+    CHARACTER.inventory.add_item(Items.KEY_HOME.value)
     execute_commands(commands=[
         "use key front door"
     ])
@@ -34,7 +34,7 @@ def test_cant_go_to_locked_room():
 
 def test_equip_melee_weapon():
     CHARACTER.melee_weapon = Items.FIST.value
-    CHARACTER.add_to_inventory(Items.KNIFE.value)
+    CHARACTER.inventory.add_item(Items.KNIFE.value)
     execute_commands(commands=[
         "equip knife"
     ])
@@ -45,7 +45,7 @@ def test_equip_melee_weapon():
 
 def test_equip_ranged_weapon():
     CHARACTER.ranged_weapon = None
-    CHARACTER.add_to_inventory(Items.BOW.value)
+    CHARACTER.inventory.add_item(Items.BOW.value)
     execute_commands(commands=[
         "equip bow"
     ])
@@ -54,12 +54,19 @@ def test_equip_ranged_weapon():
 
 
 def test_use_armor():
-    CHARACTER.add_to_inventory(Items.ARMOR.value)
+    CHARACTER.inventory.add_item(Items.ARMOR.value)
     assert CHARACTER.armor == 0
     execute_commands(commands=[
         "use armor"
     ])
     assert CHARACTER.armor == 1
+
+
+def test_max_inventory():
+    CHARACTER.inventory.max_items = 2
+    assert CHARACTER.inventory.add_item(Items.ARMOR.value)
+    assert CHARACTER.inventory.add_item(Items.COIN.value)
+    assert not CHARACTER.inventory.add_item(Items.ARROW.value)
 
 
 def test_update_respawn_point():
@@ -74,7 +81,7 @@ def test_update_respawn_point():
 
 def test_buy_item():
     CHARACTER.room = Rooms.GARAGE.value
-    CHARACTER.add_to_inventory(Items.COIN.value, 100)
+    CHARACTER.inventory.add_item(Items.COIN.value, 100)
     execute_commands(commands=[
         "buy armor"
     ])
@@ -83,7 +90,7 @@ def test_buy_item():
 
 def test_buy_multiple_items(items_to_buy: int = 5,):
     CHARACTER.room = Rooms.GARAGE.value
-    CHARACTER.add_to_inventory(Items.COIN.value, items_to_buy*100)
+    CHARACTER.inventory.add_item(Items.COIN.value, items_to_buy*100)
     execute_commands(commands=[
         f"buy armor {items_to_buy}"
     ])
@@ -111,7 +118,7 @@ def test_savepoints():
 
 
 def test_view_map():
-    CHARACTER.add_to_inventory(Items.MAP_HOME.value)
+    CHARACTER.inventory.add_item(Items.MAP_HOME.value)
     execute_commands(commands=[
         "view home map"
     ])

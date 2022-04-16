@@ -14,7 +14,7 @@ def armor(amount: int):
     from main import CHARACTER
 
     if amount <= CHARACTER.inventory[Items.ARMOR.value]:
-        CHARACTER.remove_from_inventory(Items.ARMOR.value, amount=amount)
+        CHARACTER.inventory.remove_item(Items.ARMOR.value, amount=amount)
         CHARACTER.armor += amount
     else:
         print("You don't have enough Armor in your inventory.")
@@ -25,7 +25,7 @@ def arrow(amount: int):
 
     if amount <= CHARACTER.inventory[Items.ARROW.value]:
         if CHARACTER.ranged_weapon:
-            CHARACTER.remove_from_inventory(Items.ARROW.value, amount=amount)
+            CHARACTER.inventory.remove_item(Items.ARROW.value, amount=amount)
             CHARACTER.ranged_weapon.ammunition += amount
         else:
             print("You don't have a ranged weapon equipped.")
@@ -38,7 +38,7 @@ def healing_potion(amount: int):
 
     gained_health_per_potion = 25
 
-    CHARACTER.remove_from_inventory(Items.HEALING_POTION.value, amount=amount)
+    CHARACTER.inventory.remove_item(Items.HEALING_POTION.value, amount=amount)
     CHARACTER.add_health(amount*gained_health_per_potion)
     print(f"You regained {amount*gained_health_per_potion} health")
 
@@ -50,7 +50,7 @@ def key_front_door(amount: int):
 
     if CHARACTER.room == Rooms.CORRIDOR.value:
         Rooms.FRONT_YARD.value.locked = False
-        CHARACTER.remove_from_inventory(Items.KEY_HOME.value)
+        CHARACTER.inventory.remove_item(Items.KEY_HOME.value)
         print("The front door has been unlocked")
     else:
         print("You need to use this key in the corridor")

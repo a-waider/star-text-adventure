@@ -70,9 +70,8 @@ def buy(args: 'list[str]'):
     if item in CHARACTER.room.items_to_buy:
         cost = CHARACTER.room.items_to_buy[item]
         if Items.COIN.value in CHARACTER.inventory.keys() and CHARACTER.inventory[Items.COIN.value] >= amount*cost:
-            CHARACTER.remove_from_inventory(
-                Items.COIN.value, amount*cost)
-            CHARACTER.add_to_inventory(item, amount)
+            CHARACTER.inventory.remove_item(Items.COIN.value, amount*cost)
+            CHARACTER.inventory.add_item(item, amount)
             if amount == 1:
                 print(f"{item} has been added to your inventory.")
             else:
@@ -94,7 +93,7 @@ def take(args: 'list[str]'):
     if item in CHARACTER.room.loot.keys():
         amount = CHARACTER.room.loot[item]
         CHARACTER.room.loot.pop(item, None)
-        CHARACTER.add_to_inventory(item, amount)
+        CHARACTER.inventory.add_item(item, amount)
     else:
         print("This item does not exist")
 
@@ -177,13 +176,13 @@ def equip(args: 'list[str]'):
             raise Exception("Should never enter this branch")
         if isinstance(weapon, WeaponMelee):  # Melee Weapon
             if CHARACTER.melee_weapon:
-                CHARACTER.add_to_inventory(CHARACTER.melee_weapon)
+                CHARACTER.inventory.add_item(CHARACTER.melee_weapon)
             CHARACTER.melee_weapon = weapon
         elif isinstance(weapon, WeaponRanged):  # Ranged Weapon
             if CHARACTER.ranged_weapon:
-                CHARACTER.add_to_inventory(CHARACTER.ranged_weapon)
+                CHARACTER.inventory.add_item(CHARACTER.ranged_weapon)
             CHARACTER.ranged_weapon = weapon
-        CHARACTER.remove_from_inventory(weapon)
+        CHARACTER.inventory.remove_item(weapon)
         print(
             f"You have now {weapon} equipped. Your previous equipped weapon is in your inventory.")
     else:
@@ -254,7 +253,8 @@ def attack(args: 'list[str]'):
                     new_items_string += f" and {item.__str__(amount=amount)}"
                 else:
                     new_items_string += f", {item.__str__(amount=amount)}"
-                CHARACTER.add_to_inventory(item, amount, force=True)
+                if not CHARACTER.inventory.add_item(item, amount, force=True):
+                    CHARACTER.room.loot.add_item(item, amount)
             if npc.loot:
                 if len(list(npc.loot.keys())) > 1 or npc.loot[list(npc.loot.keys())[0]] > 1:
                     print(f"{new_items_string} have been added your inventory")

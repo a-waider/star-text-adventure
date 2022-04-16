@@ -1,6 +1,5 @@
 import random
 
-from exceptions import NotEnoughInInventory, NotInInventory
 from termcolor import colored
 from utilities import colored_health, print
 from world.items import Items
@@ -36,7 +35,7 @@ class Person:
         self.melee_weapon: WeaponMelee = melee_weapon
         self.ranged_weapon: WeaponRanged = ranged_weapon
         self.inventory: 'Inventory[Item,int]' = inventory if inventory is not None else Inventory(
-        )
+            max_items=5)
         self.max_inventory_items: int = max_inventory_items
         self.intelligence: int = intelligence
         self.room: Room = room
@@ -106,27 +105,6 @@ class Person:
             self.health -= damage
         else:
             self.health = max(self.health - int(damage / self.armor * 10), 0)
-
-    def add_to_inventory(self, item: Item, amount: int = 1, force=False):
-        if item in self.inventory:
-            self.inventory[item] += amount
-        else:
-            if len(self.inventory) < self.max_inventory_items or force:
-                self.inventory[item] = amount
-            else:
-                print(
-                    f"Couldn't add this to your inventory. The maximum capacity of {self.max_inventory_items} is reached.")
-
-    def remove_from_inventory(self, item: Item, amount: int = 1):
-        if item in self.inventory:
-            if amount < self.inventory[item]:
-                self.inventory[item] -= amount
-            elif amount == self.inventory[item]:
-                self.inventory.pop(item, None)
-            else:
-                raise NotEnoughInInventory
-        else:
-            raise NotInInventory
 
     def add_health(self, health_points: int):
         self.health = min(self.health+health_points, self.max_health)

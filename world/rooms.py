@@ -35,7 +35,7 @@ def neighbor_joe():
         "Neighbor: \"I was able to protect this map of the streets from the Zombies. Hopefully it can help you to stay alive and stop the zombie apocalypse. My fight is over, good luck.\"",
         f"There is nothing you can do to help your neighbor. His injuries are too bad. Type \"view {Items.MAP_STREET.value}\" to view the map"])
 
-    CHARACTER.add_to_inventory(Items.MAP_STREET.value)
+    CHARACTER.inventory.add_item(Items.MAP_STREET.value)
 
 
 class Rooms(Enum):
