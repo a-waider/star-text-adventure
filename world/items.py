@@ -184,7 +184,6 @@ def map_street_blurred(blurred: bool = True):
 {" "*room_name_length}    {"|".center(room_name_length)}    {"|".center(room_name_length)}
 {" "*room_name_length}    {_room_string(Rooms.WILSON_GROVE.value, blurred=blurred)}----{_room_string(Rooms.NEWMAN_ROW.value)}----{_room_string(Rooms.MOTEL_ONE.value, blurred=blurred)}
 """, sleep_time=0.0001)
-    pass
 
 
 def map_street_full():

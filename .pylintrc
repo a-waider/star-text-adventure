@@ -15,6 +15,7 @@ disable=missing-module-docstring,
     use-list-literal,
     use-dict-literal,
     unspecified-encoding,
+    no-self-use,
 
 [FORMAT]
 max-line-length=120
