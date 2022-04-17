@@ -77,6 +77,8 @@ class Room:
         if self.npc:
             print(f"----- {self.npc} -----")
             print(self.npc.fighting_stats())
+            print(f"----- {CHARACTER} -----")
+            print(CHARACTER.fighting_stats())
             print("-----")
             return
         if self.enter_room_function:

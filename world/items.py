@@ -1,8 +1,8 @@
 from enum import Enum
 
-from termcolor import colored
 from classes.item import Item, Map, WeaponMelee, WeaponRanged
 from classes.room import Room
+from termcolor import colored
 from utilities import print
 
 ROOM_NAME_LENGTH = 24
@@ -39,14 +39,15 @@ def arrow(amount: int):
 
 def healing_potion(amount: int):
     from main import CHARACTER
-    from commands import show_health
+
+    from world.commands import show_statistics
 
     gained_health_per_potion = 25
 
     CHARACTER.inventory.remove_item(Items.HEALING_POTION.value, amount=amount)
     CHARACTER.add_health(amount*gained_health_per_potion)
     print(f"You regained {amount*gained_health_per_potion} health.")
-    show_health()
+    show_statistics()
 
 
 def key_front_door(amount: int):

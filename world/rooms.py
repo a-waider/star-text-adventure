@@ -183,9 +183,9 @@ class Rooms(Enum):
     PRINCESS_MAGDALENA_GARDEN: Room = Room(
         name="Princess Magdalena garden",
         npc=NPC(
-            name="Zombie tank",
+            name="Armored zombie",
             max_health=60,
-            armor=30,
+            armor=20,
             base_damage=10,
             krit_damage=12,
             krit_chance=0.5,

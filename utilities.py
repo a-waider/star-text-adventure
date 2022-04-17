@@ -33,12 +33,15 @@ def trailing_s(name: str) -> str:
 
 
 def colored_health(health: int, max_health: int) -> 'Tuple[str,str]':
-    if health/max_health < 0.3:
-        health_color = "yellow"
-        heart_icon = "💛"
+    if health == 0:
+        health_color = "red"
+        heart_icon = "💔"
     elif health/max_health < 0.1:
         health_color = "red"
-        heart_icon = "❤"
+        heart_icon = "🧡"
+    elif health/max_health < 0.3:
+        health_color = "yellow"
+        heart_icon = "💛"
     else:
         health_color = "green"
         heart_icon = "💚"

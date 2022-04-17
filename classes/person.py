@@ -6,8 +6,10 @@ from world.items import Items
 from world.rooms import Rooms
 
 from classes.inventory import Inventory
-from classes.item import Item, WeaponMelee, WeaponRanged
+from classes.item import Item, Weapon, WeaponMelee, WeaponRanged
 from classes.room import Room
+
+MAX_LUCK = 10
 
 
 class Person:
@@ -16,7 +18,7 @@ class Person:
             name: str = None,
             health: int = 100,
             max_health: int = 100,
-            luck: int = random.randint(1, 10),
+            luck: int = random.randint(1, MAX_LUCK),
             armor: int = 0,
             melee_weapon: WeaponMelee = Items.REMOTE.value,
             ranged_weapon: WeaponRanged = None,
@@ -46,9 +48,14 @@ class Person:
     def __str__(self) -> str:
         return self.name
 
-    def fighting_stats(self, ammunition: bool = False) -> str:
+    def stats(self, ammunition: bool = False, prev_health: int = None, prev_armor: int = None):
+        return f"{self.fighting_stats(ammunition=ammunition, prev_health=prev_health, prev_armor=prev_armor)}\n{'Luck: ':15}   {self.luck}"
+
+    def fighting_stats(self, ammunition: bool = False, prev_health: int = None, prev_armor: int = None) -> str:
         heart_icon, health_color = colored_health(self.health, self.max_health)
-        ret = f"{'Health: ':15}{heart_icon} {colored(self.health, health_color)}\n{'Armor: ':15}🛡  {colored(self.armor, 'blue')}\n{'Kills: ':15}   {self.kills}\n{'Deaths: ':15}💀 {self.deaths}"
+        health_lost_string: str = f"{prev_health} - {prev_health-self.health} = " if prev_health else ""
+        armor_damage_string: str = f"{prev_armor} - {prev_armor-self.armor} = " if prev_armor else ""
+        ret = f"{'Health: ':15}{heart_icon} {health_lost_string}{colored(f'{self.health} / {self.max_health}', health_color)}\n{'Armor: ':15}🛡  {armor_damage_string}{colored(self.armor, 'blue')}\n{'Kills: ':15}   {self.kills}\n{'Deaths: ':15}💀 {self.deaths}"
         if ammunition:
             ret += f"\n{'Ammunition: ':15}: {self.ranged_weapon.ammunition}"
         return ret
@@ -92,6 +99,21 @@ class Person:
             json_object["respawn_point"])
         CHARACTER.kills = json_object["kills"] if json_object["kills"] else 0
         CHARACTER.deaths = json_object["deaths"] if json_object["deaths"] else 0
+
+    def attack(self, weapon: Weapon) -> int:
+        if isinstance(weapon, WeaponMelee):
+            if self.melee_weapon:
+                return int(self.melee_weapon.attack() * self.intelligence / 100)
+            print("You don't have a melee weapon.")
+        elif isinstance(weapon, WeaponRanged):
+            if self.ranged_weapon:
+                try:
+                    return int(self.ranged_weapon.attack() * self.intelligence / 100)
+                except TypeError:
+                    return None
+            print("You don't have a ranged weapon.")
+        print("TODO: ")
+        return None
 
     def attack_melee(self) -> int:
         return int(self.melee_weapon.attack() * self.intelligence / 100)

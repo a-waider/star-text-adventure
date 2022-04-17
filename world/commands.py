@@ -1,11 +1,12 @@
-from enum import Enum
 import json
+import random
 import sys
+from enum import Enum
 
 from classes.command import Command
 from classes.item import Item, Map, Weapon, WeaponMelee, WeaponRanged
 from classes.npc import NPC
-from classes.person import Person
+from classes.person import Person, MAX_LUCK
 from classes.room import Room
 from utilities import print, trailing_s
 
@@ -28,13 +29,13 @@ def help_menu(args: 'list[str]'):
     print("-----", sleep_time=sleep_time)
 
 
-def show_statistics(args: 'list[str]'):
+def show_statistics(args: 'list[str]' = None):
     from main import CHARACTER
 
     sleep_time = 0.001
     print(f"----- {trailing_s(CHARACTER)} Statistics -----",
           sleep_time=sleep_time)
-    print(CHARACTER.fighting_stats(), sleep_time=sleep_time)
+    print(f"{CHARACTER.stats()}", sleep_time=sleep_time)
     print("-----", sleep_time=sleep_time)
 
 
@@ -197,7 +198,7 @@ def equip(args: 'list[str]'):
             CHARACTER.ranged_weapon = weapon
         CHARACTER.inventory.remove_item(weapon)
         print(
-            f"You have now {weapon} equipped. Your previous equipped weapon is in your inventory.")
+            f"You have now {weapon} equipped.")
     else:
         print(f"You can't equip {' '.join(args)}")
 
@@ -234,57 +235,53 @@ def attack(args: 'list[str]'):
 
     npc: NPC = CHARACTER.room.npc
     if npc:
-        character_attack_damage: int = 0
         if args[0] == "melee":
-            if CHARACTER.melee_weapon:
-                character_attack_damage = CHARACTER.attack_melee()
-            else:
-                print("You don't have a melee weapon")
-                return
+            weapon = CHARACTER.melee_weapon
         elif args[0] == "ranged":
-            if CHARACTER.ranged_weapon:
-                character_attack_damage = CHARACTER.attack_ranged()
-            else:
-                print("You don't have a ranged weapon")
-                return
+            weapon = CHARACTER.ranged_weapon
         else:
             print(
                 "You must define which weapon type you want to use. Valid types are \"melee\" and \"ranged\".")
             return
+        character_attack_damage = CHARACTER.attack(weapon=weapon)
         npc_attack_damage = npc.attack()
-        npc.defend(character_attack_damage)
-        CHARACTER.defend(npc_attack_damage)
-        if npc.health <= 0:
-            CHARACTER.kills += 1
-            print(f"----- {CHARACTER} ----")
-            print(CHARACTER.fighting_stats())
-            print("-----")
-            print(f"You defeated {npc}.")
-            new_items_string = ""
-            for item, amount in npc.loot.items():
-                if item == list(npc.loot.keys())[0]:
-                    new_items_string += item.__str__(amount=amount)
-                elif item == list(npc.loot.keys())[-1]:
-                    new_items_string += f" and {item.__str__(amount=amount)}"
-                else:
-                    new_items_string += f", {item.__str__(amount=amount)}"
-                if not CHARACTER.inventory.add_item(item, amount):
+        character_prev_health = CHARACTER.health
+        character_prev_armor = CHARACTER.armor
+        npc_prev_health = npc.health
+        npc_prev_armor = npc.armor
+        if not character_attack_damage:
+            return
+        if CHARACTER.luck > random.randint(0, MAX_LUCK):
+            print("You are lucky you can start attacking.")
+            npc.defend(character_attack_damage)
+            if npc.health <= 0:
+                CHARACTER.kills += 1
+                print(f"You defeated {npc}.")
+                for item, amount in npc.loot.items():
                     CHARACTER.room.loot.add_item(item, amount)
-            CHARACTER.room.npc = None
-            CHARACTER.room.enter_room()
-        elif CHARACTER.health <= 0:
+                CHARACTER.room.npc = None
+                CHARACTER.room.enter_room()
+                return
+            CHARACTER.defend(npc_attack_damage)
+        else:
+            print(f"{npc} starts attacking.")
+            CHARACTER.defend(npc_attack_damage)
+            if CHARACTER.health > 0:
+                npc.defend(character_attack_damage)
+        if CHARACTER.health <= 0:
             CHARACTER.deaths += 1
             CHARACTER.health = 100
             CHARACTER.room = CHARACTER.respawn_point
             print(
                 f"You have been killed by {npc} and respawn in {CHARACTER.room}")
             create_savepoint()
-        else:
-            print(f"----- {npc} -----")
-            print(npc.fighting_stats())
-            print(f"----- {CHARACTER} ----")
-            print(CHARACTER.fighting_stats())
-            print("-----")
+        print(f"----- {npc} -----")
+        print(npc.fighting_stats(
+            prev_health=npc_prev_health, prev_armor=npc_prev_armor))
+        print(f"----- {CHARACTER} -----")
+        print(npc.fighting_stats(
+            prev_health=character_prev_health, prev_armor=character_prev_armor))
+        print("-----")
     else:
         print("There are no npc's to fight.")
 

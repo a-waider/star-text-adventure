@@ -77,6 +77,8 @@ class NPC:
         else:
             self.health = max(self.health-int(damage / self.armor * 10), 0)
 
-    def fighting_stats(self) -> str:
+    def fighting_stats(self, prev_health: int = None, prev_armor: int = None) -> str:
         heart_icon, health_color = colored_health(self.health, self.max_health)
-        return f"{'Health: ':15}{heart_icon} {colored(self.health, health_color)}\n{'Armor: ':15}🛡  {colored(self.armor, 'blue')}"
+        health_lost_string: str = f"{prev_health} - {prev_health-self.health} = " if prev_health else ""
+        armor_damage_string: str = f"{prev_armor} - {prev_armor-self.armor} = " if prev_armor else ""
+        return f"{'Health: ':15}{heart_icon} {health_lost_string}{colored(f'{self.health} / {self.max_health}', health_color)}\n{'Armor: ':15}🛡  {armor_damage_string}{colored(self.armor, 'blue')}"
