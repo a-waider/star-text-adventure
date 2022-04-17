@@ -17,7 +17,7 @@ disable=missing-module-docstring,
     unspecified-encoding,
 
 [FORMAT]
-max-line-length=250
+max-line-length=120
 max-args=15
 max-attributes=15
 max-statements=60

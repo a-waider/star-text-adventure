@@ -81,4 +81,6 @@ class NPC:
         heart_icon, health_color = colored_health(self.health, self.max_health)
         health_lost_string: str = f"{prev_health} - {prev_health-self.health} = " if prev_health else ""
         armor_damage_string: str = f"{prev_armor} - {prev_armor-self.armor} = " if prev_armor else ""
-        return f"{'Health: ':15}{heart_icon} {health_lost_string}{colored(f'{self.health} / {self.max_health}', health_color)}\n{'Armor: ':15}🛡  {armor_damage_string}{colored(self.armor, 'blue')}"
+        return f"""{'Health: ':15}{heart_icon} {health_lost_string}\
+{colored(f'{self.health} / {self.max_health}', health_color)}
+{'Armor: ':15}🛡  {armor_damage_string}{colored(self.armor, 'blue')}"""

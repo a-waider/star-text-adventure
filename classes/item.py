@@ -162,5 +162,6 @@ class WeaponRanged(Weapon):
             self.ammunition -= 1
             return super().attack()
         print(
-            f"You have no more ammunition. You can refill it with the appropriate ammunition e.g. for the {Items.GUN.value} type \"use {Items.BULLET_MAGAZINE.value.name}\".")
+            f"You have no more ammunition. You can refill it with the appropriate ammunition \
+e.g. for the {Items.GUN.value} type \"use {Items.BULLET_MAGAZINE.value.name}\".")
         return None

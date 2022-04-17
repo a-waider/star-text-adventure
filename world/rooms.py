@@ -11,7 +11,8 @@ from world.items import Items
 def bedroom():
     if not Rooms.BEDROOM.value.visited:
         print([
-            f"Let's start by finding out where you can go. Type \"where can i go\" and go there with e.g. \"go {Rooms.CORRIDOR.value.name}\""
+            f"Let's start by finding out where you can go. \
+Type \"where can i go\" and go there with e.g. \"go {Rooms.CORRIDOR.value.name}\""
         ])
 
 
@@ -25,7 +26,8 @@ def corridor():
         if not CHARACTER.inventory.add_item(Items.MAP_HOME.value):
             CHARACTER.room.loot.add_item(Items.MAP_HOME.value)
             print([
-                f"The item still lies in the {Rooms.CORRIDOR.value}. You need to drop an item before you can take the map."
+                f"The item still lies in the {Rooms.CORRIDOR.value}. \
+You need to drop an item before you can take the map."
             ])
         else:
             print([
@@ -41,7 +43,9 @@ def corridor():
 def lounge():
     if len(Rooms.LOUNGE.value.loot) > 0:
         print([
-            f"Look around you! Did you notice the items lying around? Type \"search room\", \"search\" or \"look\" and take the item with e.g. \"take {list(Rooms.LOUNGE.value.loot.keys())[0].name}\".",
+            f"Look around you! Did you notice the items lying around? \
+Type \"search room\", \"search\" or \"look\" and take the item with \
+e.g. \"take {list(Rooms.LOUNGE.value.loot.keys())[0].name}\".",
             "Maybe there are more items in the other rooms."
         ])
 
@@ -50,7 +54,8 @@ def kitchen():
     if not Rooms.KITCHEN.value.visited:
         print([
             "You just killed your own wife!",
-            "You're realizing that either you're still caught in a really bad dream or the zombie apocalypse became real.",
+            "You're realizing that either you're still caught in a really bad dream \
+or the zombie apocalypse became real.",
             "Either way, you have to get through it and survive as long as you can."
         ])
 
@@ -77,7 +82,9 @@ def neighbor_joe():
             "You enter the house of your neighbor and see him coverd in blood lying on the floor.",
             f"Neighbor: \"{CHARACTER}! Good, you're still alive. Zombies attacked me and raided my house.\"",
             "You: \"Yes my wife also turned into a Zombie. I needed to kill her to survive.\"",
-            "Neighbor: \"Oh no. I'm glad you're still at good health. I was able to protect this map of the streets from the zombies. Hopefully it can help you to stay alive and stop the zombie apocalypse. My fight is over, good luck.\"",
+            "Neighbor: \"Oh no. I'm glad you're still at good health. \
+I was able to protect this map of the streets from the zombies. \
+Hopefully it can help you to stay alive and stop the zombie apocalypse. My fight is over, good luck.\"",
             "There is nothing you can do to help your neighbor. His injuries are too bad.",
             "You stab a knife in his head to stop him from turning into a zombie."
         ])

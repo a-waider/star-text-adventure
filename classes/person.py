@@ -49,13 +49,18 @@ class Person:
         return self.name
 
     def stats(self, ammunition: bool = False, prev_health: int = None, prev_armor: int = None):
-        return f"{self.fighting_stats(ammunition=ammunition, prev_health=prev_health, prev_armor=prev_armor)}\n{'Luck: ':15}   {self.luck}"
+        return f"""{self.fighting_stats(ammunition=ammunition, prev_health=prev_health, prev_armor=prev_armor)}
+{'Luck: ':15}   {self.luck}"""
 
     def fighting_stats(self, ammunition: bool = False, prev_health: int = None, prev_armor: int = None) -> str:
         heart_icon, health_color = colored_health(self.health, self.max_health)
         health_lost_string: str = f"{prev_health} - {prev_health-self.health} = " if prev_health else ""
         armor_damage_string: str = f"{prev_armor} - {prev_armor-self.armor} = " if prev_armor else ""
-        ret = f"{'Health: ':15}{heart_icon} {health_lost_string}{colored(f'{self.health} / {self.max_health}', health_color)}\n{'Armor: ':15}🛡  {armor_damage_string}{colored(self.armor, 'blue')}\n{'Kills: ':15}   {self.kills}\n{'Deaths: ':15}💀 {self.deaths}"
+        ret = f"""{'Health: ':15}{heart_icon} {health_lost_string}\
+{colored(f'{self.health} / {self.max_health}', health_color)}
+{'Armor: ':15}🛡  {armor_damage_string}{colored(self.armor, 'blue')}
+{'Kills: ':15}   {self.kills}
+{'Deaths: ':15}💀 {self.deaths}"""
         if ammunition:
             ret += f"\n{'Ammunition: ':15}: {self.ranged_weapon.ammunition}"
         return ret
