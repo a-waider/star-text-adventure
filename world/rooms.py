@@ -71,8 +71,6 @@ def gravestone():
 
 
 def neighbor_joe():
-    # pylint: disable=line-too-long
-
     from main import CHARACTER
     if not Rooms.NEIGHBOR_JOES_HOUSE.value.visited:
         print([

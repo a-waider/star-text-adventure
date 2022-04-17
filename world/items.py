@@ -1,8 +1,8 @@
 from enum import Enum
 
+from termcolor import colored
 from classes.item import Item, Map, WeaponMelee, WeaponRanged
 from classes.room import Room
-from termcolor import colored
 from utilities import print
 
 ROOM_NAME_LENGTH = 24

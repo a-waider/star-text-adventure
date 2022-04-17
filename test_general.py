@@ -5,6 +5,11 @@ from world.items import Items
 from world.rooms import Rooms
 
 
+def setup_function():
+    CHARACTER.inventory.clear()
+    CHARACTER.inventory.max_items = 5
+
+
 def execute_commands(commands: 'list[str]'):
     main(test_mode=True, user_commands=commands)
 
@@ -17,14 +22,15 @@ def test_unlock_front_door():
         f"use {Items.KEY_HOME.value.name}"
     ])
     assert Rooms.FRONT_YARD.value.locked is False
+    assert Items.KEY_HOME.value not in CHARACTER.inventory
     execute_commands(commands=[
         f"go {Rooms.FRONT_YARD.value.name}"
     ])
     assert CHARACTER.room == Rooms.FRONT_YARD.value
+    Rooms.FRONT_YARD.value.locked = True
 
 
 def test_cant_go_to_locked_room():
-    Rooms.FRONT_YARD.value.locked = True
     CHARACTER.room = Rooms.CORRIDOR.value
     execute_commands(commands=[
         f"go {Rooms.FRONT_YARD.value.name}"
@@ -33,33 +39,26 @@ def test_cant_go_to_locked_room():
     assert Rooms.FRONT_YARD.value.locked is True
 
 
-def test_take_item():
+def test_take_item(items_to_take: int = 3):
     Rooms.CORRIDOR.value.loot = Inventory({
-        Items.COIN.value: 1
+        Items.COIN.value: items_to_take
     })
     CHARACTER.room = Rooms.CORRIDOR.value
-    CHARACTER.inventory = Inventory()
     execute_commands(commands=[
         f"take {Items.COIN.value.name}"
     ])
     assert Items.COIN.value in CHARACTER.inventory
+    assert CHARACTER.inventory[Items.COIN.value] == items_to_take
 
 
-def test_drop_item():
-    Rooms.CORRIDOR.value.loot = Inventory({
-        Items.COIN.value: 1
-    })
-    CHARACTER.room = Rooms.CORRIDOR.value
-    CHARACTER.inventory = Inventory(
-        inventory={
-            Items.ARMOR.value: 1
-        },
-        max_items=1)
+def test_drop_item(items_to_drop: int = 2):
+    CHARACTER.inventory.add_item(Items.COIN.value, items_to_drop)
     execute_commands(commands=[
-        f"take {Items.COIN.value.name}"
+        f"drop {Items.COIN.value.name}"
     ])
     assert Items.COIN.value not in CHARACTER.inventory
     assert Items.COIN.value in CHARACTER.room.loot
+    assert CHARACTER.room.loot[Items.COIN.value] == items_to_drop
 
 
 def test_equip_melee_weapon():
@@ -69,8 +68,8 @@ def test_equip_melee_weapon():
         f"equip {Items.KNIFE.value.name}"
     ])
     assert CHARACTER.melee_weapon == Items.KNIFE.value
-    assert Items.KNIFE.value not in CHARACTER.inventory.keys()
-    assert Items.REMOTE.value in CHARACTER.inventory.keys()
+    assert Items.KNIFE.value not in CHARACTER.inventory
+    assert Items.REMOTE.value in CHARACTER.inventory
 
 
 def test_equip_ranged_weapon():
@@ -113,6 +112,7 @@ def test_npc_loot_drops_in_room_loot_if_inventory_full():
 def test_update_respawn_point():
     CHARACTER.room = Rooms.CORRIDOR.value
     CHARACTER.respawn_point = Rooms.BEDROOM.value
+    Rooms.FRONT_YARD.value.visited = False
     Rooms.FRONT_YARD.value.locked = False
     execute_commands(commands=[
         f"go {Rooms.FRONT_YARD.value.name}"
@@ -129,16 +129,6 @@ def test_buy_item():
     assert Items.HEALING_POTION.value in CHARACTER.inventory
 
 
-def test_use_on_pickup():
-    CHARACTER.room = Rooms.GARAGE.value
-    CHARACTER.inventory.add_item(Items.COIN.value, 100)
-    assert CHARACTER.armor == 0
-    execute_commands(commands=[
-        f"buy {Items.ARMOR.value.name}"
-    ])
-    assert CHARACTER.armor == 1
-
-
 def test_buy_multiple_items(items_to_buy: int = 5,):
     CHARACTER.room = Rooms.GARAGE.value
     CHARACTER.inventory.add_item(Items.COIN.value, items_to_buy*100)
@@ -150,6 +140,16 @@ def test_buy_multiple_items(items_to_buy: int = 5,):
         items_to_buy * \
         Rooms.GARAGE.value.items_to_buy[Items.HEALING_POTION.value]
     assert Items.HEALING_POTION.value in CHARACTER.inventory
+
+
+def test_use_on_pickup():
+    CHARACTER.room = Rooms.GARAGE.value
+    CHARACTER.inventory.add_item(Items.COIN.value, 100)
+    assert CHARACTER.armor == 0
+    execute_commands(commands=[
+        f"buy {Items.ARMOR.value.name}"
+    ])
+    assert CHARACTER.armor == 1
 
 
 def test_fight():
