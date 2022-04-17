@@ -157,6 +157,7 @@ class WeaponRanged(Weapon):
 
     def attack(self) -> int:
         if self.ammunition > 0:
+            self.ammunition -= 1
             return super().attack()
         print("You have no more ammunition.")
         return None

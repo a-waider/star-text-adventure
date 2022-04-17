@@ -162,6 +162,19 @@ def test_fight():
     assert CHARACTER.room.npc is None
 
 
+def test_ammunition_decrease_after_fight():
+    Rooms.KITCHEN.value.npc = NPC("dummy", health=1, base_damage=3)
+    CHARACTER.room = Rooms.LOUNGE.value
+    CHARACTER.ranged_weapon = Items.GUN.value
+    CHARACTER.ranged_weapon.ammunition = 1
+    execute_commands(commands=[
+        f"go {Rooms.KITCHEN.value.name}",
+        "attack ranged",
+    ])
+    assert CHARACTER.ranged_weapon.ammunition == 0
+    assert CHARACTER.room.npc is None
+
+
 def test_savepoints():
     execute_commands(commands=[
         "import savepoint",
