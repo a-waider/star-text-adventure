@@ -5,6 +5,7 @@ import sys
 import readchar
 
 from classes.person import Person
+from classes.command import Command
 from utilities import print
 from world.commands import Commands, create_savepoint, import_savepoint
 from world.items import Items
@@ -68,31 +69,29 @@ def main(test_mode: bool = False, user_commands: 'list[str]' = None):
             user_input = input("Enter your command: ").strip().lower()
         valid_user_input = False
         for command in Commands:
-            try:
-                if user_input != "" and (user_input.startswith(command.value.keyword) or [alias for alias in command.value.aliases if user_input.startswith(alias)]):
-                    if user_input.startswith(command.value.keyword):
-                        args = user_input.replace(
-                            command.value.keyword, "", 1).strip().lower().split(" ")
-                    else:
-                        for alias in command.value.aliases:
-                            if user_input.startswith(alias):
-                                args = user_input.replace(
-                                    alias, "", 1).strip().lower().split(" ")
-                                break
-                    try:
-                        args.remove("")
-                    except ValueError:
-                        pass
-                    valid_user_input = True
-                    if not bool(CHARACTER.room.npc) or command.value.available_in_fight:
-                        command.value.run_command(
-                            current_room=CHARACTER.room, args=args)
-                        create_savepoint(background=True)
-                    else:
-                        print("This command is disabled during fights.")
-                    break
-            except AttributeError:
-                pass
+            command: Command = command.value
+            if user_input.startswith(command.keyword) or [alias for alias in command.aliases if user_input.startswith(alias)]:
+                if user_input.startswith(command.keyword):
+                    args = user_input.replace(
+                        command.keyword, "", 1).strip().lower().split(" ")
+                else:
+                    for alias in command.aliases:
+                        if user_input.startswith(alias):
+                            args = user_input.replace(
+                                alias, "", 1).strip().lower().split(" ")
+                            break
+                try:
+                    args.remove("")
+                except ValueError:
+                    pass
+                valid_user_input = True
+                if not bool(CHARACTER.room.npc) or command.available_in_fight:
+                    command.run_command(
+                        current_room=CHARACTER.room, args=args)
+                    create_savepoint(background=True)
+                else:
+                    print("This command is disabled during fights.")
+                break
         if not valid_user_input:
             print(
                 "This is not a valid command. Try \"help\" for a list of valid commands.")
