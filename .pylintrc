@@ -12,7 +12,9 @@ disable=missing-module-docstring,
     unused-import,
 
 [FORMAT]
-max-line-length=140
+max-line-length=250
 max-args=15
-max-attributes=12
-max-branches=17
+max-attributes=15
+max-statements=60
+max-branches=20
+max-nested-blocks=10
