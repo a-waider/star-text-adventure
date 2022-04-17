@@ -31,10 +31,11 @@ def help_menu(args: 'list[str]'):
 def show_statistics(args: 'list[str]'):
     from main import CHARACTER
 
-    print(f"----- {trailing_s(CHARACTER)} Statistics -----")
-    print(f"Kills: {CHARACTER.kills}")
-    print(f"Deaths: {CHARACTER.deaths}")
-    print("-----")
+    sleep_time = 0.001
+    print(f"----- {trailing_s(CHARACTER)} Statistics -----",
+          sleep_time=sleep_time)
+    print(CHARACTER.fighting_stats(), sleep_time=sleep_time)
+    print("-----", sleep_time=sleep_time)
 
 
 def show_inventory(args: 'list[str]'):
@@ -49,14 +50,6 @@ def show_inventory(args: 'list[str]'):
               sleep_time=sleep_time)
     for item, amount in CHARACTER.inventory.items():
         print(f"{item.__str__(amount=amount)}", sleep_time=sleep_time)
-    print("-----", sleep_time=sleep_time)
-
-
-def show_health(args: 'list[str]' = None):
-    from main import CHARACTER
-
-    print(f"----- {trailing_s(CHARACTER)} Health -----")
-    print(CHARACTER.fighting_stats())
     print("-----")
 
 
@@ -358,11 +351,6 @@ class Commands(Enum):
         description="Shows the inventory of your character",
         available_in_fight=True,
         command=show_inventory)
-    SHOW_HEALTH: Command = Command(
-        "show health",
-        description="Shows the health of your character",
-        available_in_fight=True,
-        command=show_health)
     WHERE_AM_I: Command = Command(
         "where am i",
         description="Shows your current room",

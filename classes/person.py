@@ -44,12 +44,11 @@ class Person:
         self.deaths: int = deaths
 
     def __str__(self) -> str:
-        print()
         return self.name
 
     def fighting_stats(self, ammunition: bool = False) -> str:
         heart_icon, health_color = colored_health(self.health, self.max_health)
-        ret = f"{'Health: ':15}{heart_icon} {colored(self.health, health_color)}\n{'Armor: ':15}🛡  {colored(self.armor, 'blue')}"
+        ret = f"{'Health: ':15}{heart_icon} {colored(self.health, health_color)}\n{'Armor: ':15}🛡  {colored(self.armor, 'blue')}\n{'Kills: ':15}   {self.kills}\n{'Deaths: ':15}💀 {self.deaths}"
         if ammunition:
             ret += f"\n{'Ammunition: ':15}: {self.ranged_weapon.ammunition}"
         return ret
