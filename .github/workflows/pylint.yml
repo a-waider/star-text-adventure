@@ -20,7 +20,7 @@ jobs:
                   python -m pip install --upgrade pip
                   pip install -r requirements.txt
 
-            - name: Run test suite
+            - name: Run linter
               run: |
                   python -m pylint pylint $(git ls-files '*.py')
               # python -m pylint *.py classes/*.py world/*.py
