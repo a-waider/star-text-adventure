@@ -5,6 +5,7 @@ from typing import Tuple
 def print(text: 'list[str]' = "", sleep_time: int = 0.01):
     # pylint: disable=cyclic-import
     from builtins import print
+
     from main import TEST_MODE
 
     def text_print(text: str):

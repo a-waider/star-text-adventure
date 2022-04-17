@@ -44,6 +44,7 @@ class Person:
         self.deaths: int = deaths
 
     def __str__(self) -> str:
+        print()
         return self.name
 
     def fighting_stats(self, ammunition: bool = False) -> str:

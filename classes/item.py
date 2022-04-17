@@ -32,8 +32,6 @@ class Item:
         return ret
 
     def use(self, amount: int = 1):
-        from main import CHARACTER
-
         if self.use_function:
             try:
                 self.use_function(amount=amount)

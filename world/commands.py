@@ -149,8 +149,6 @@ def use(args: 'list[str]'):
 def view(args: 'list[str]'):
     from main import CHARACTER
 
-    from world.items import Items
-
     map_name = " ".join(args)
     map_object = Map.get_map_by_name(map_name)
     if map_object in CHARACTER.inventory.keys():
@@ -240,7 +238,6 @@ def attack(args: 'list[str]'):
     from main import CHARACTER
 
     from world.commands import create_savepoint
-    from world.rooms import respawn_rooms
 
     npc: NPC = CHARACTER.room.npc
     if npc:
@@ -315,8 +312,6 @@ def create_savepoint(args: 'list[str]' = None, background: bool = False):
 
 def import_savepoint(args: 'list[str]' = None):
     from main import CHARACTER, DEFAULT_SAVEPOINT_FILENAME
-
-    from world.items import Items
 
     filename = " ".join(args) if isinstance(
         args, list) else DEFAULT_SAVEPOINT_FILENAME

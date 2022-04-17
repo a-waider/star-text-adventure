@@ -39,7 +39,6 @@ class NPC:
         return colored(self.name, color="red")
 
     def to_json(self):
-        from world.items import Items
         return {
             "name": self.name,
             "max_health": self.max_health,
@@ -53,8 +52,6 @@ class NPC:
 
     @staticmethod
     def from_json(json_object: 'dict') -> 'NPC':
-        from world.items import Items
-
         return NPC(
             name=json_object["name"],
             max_health=json_object["max_health"] if json_object["max_health"] else DEFAULT_MAX_HEALTH,

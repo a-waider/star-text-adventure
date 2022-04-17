@@ -10,6 +10,9 @@ disable=missing-module-docstring,
     redefined-builtin,
     redefined-outer-name,
     unused-import,
+    wrong-import-order,
+    use-list-literal,
+    use-dict-literal,
 
 [FORMAT]
 max-line-length=250

@@ -86,8 +86,6 @@ def _room_string(room: Room) -> str:
 
 
 def map_home():
-    from main import CHARACTER
-
     from world.rooms import Rooms
 
     print(f"""
