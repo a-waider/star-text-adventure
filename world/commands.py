@@ -106,11 +106,11 @@ def drop(args: 'list[str]'):
     elif item.name in (CHARACTER.melee_weapon.name,  CHARACTER.ranged_weapon.name):
         amount = 1
     else:
-        print("You can't drop an item you don't have in your inventory")
+        print("You can't drop an item you don't have in your inventory.")
         return
     if CHARACTER.inventory.remove_item(item, amount):
         CHARACTER.room.loot.add_item(item, amount)
-    print(f"Dropped {item.__str__(amount=amount)} in {CHARACTER.room}")
+    print(f"Dropped {item.__str__(amount=amount)} in {CHARACTER.room}.")
 
 
 def search_room(args: 'list[str]'):
@@ -138,7 +138,7 @@ def use(args: 'list[str]'):
     if item in CHARACTER.inventory:
         item.use(amount=amount)
     else:
-        print("You don't have this item in your inventory")
+        print("You don't have this item in your inventory.")
 
 
 def view(args: 'list[str]'):
@@ -149,7 +149,7 @@ def view(args: 'list[str]'):
     if map_object in CHARACTER.inventory.keys():
         map_object.view()
     else:
-        print("You don't have this map in your inventory")
+        print("You don't have this map in your inventory.")
 
 
 def where_am_i(args: 'list[str]'):
@@ -226,7 +226,7 @@ def inspect(args: 'list[str]'):
             print(f"Ammunition: {CHARACTER.ranged_weapon.ammunition}")
         print("-----")
     else:
-        print("You don't have this weapon equipped or in your inventory")
+        print("You don't have this weapon equipped or in your inventory.")
 
 
 def attack(args: 'list[str]'):
@@ -262,8 +262,8 @@ def attack(args: 'list[str]'):
                     CHARACTER.room.loot.add_item(item, amount)
                 CHARACTER.room.npc = None
                 CHARACTER.room.enter_room()
-                return
-            CHARACTER.defend(npc_attack_damage)
+            else:
+                CHARACTER.defend(npc_attack_damage)
         else:
             print(f"{npc} starts attacking.")
             CHARACTER.defend(npc_attack_damage)
@@ -280,7 +280,7 @@ def attack(args: 'list[str]'):
         print(npc.fighting_stats(
             prev_health=npc_prev_health, prev_armor=npc_prev_armor))
         print(f"----- {CHARACTER} -----")
-        print(npc.fighting_stats(
+        print(CHARACTER.fighting_stats(
             prev_health=character_prev_health, prev_armor=character_prev_armor))
         print("-----")
     else:

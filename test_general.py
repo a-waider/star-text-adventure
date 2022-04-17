@@ -48,7 +48,7 @@ class TestInventory(Test):
         CHARACTER.inventory.max_items = 2
         assert CHARACTER.inventory.add_item(Items.KNIFE.value)
         assert CHARACTER.inventory.add_item(Items.COIN.value)
-        assert not CHARACTER.inventory.add_item(Items.BULLET_MAGAZINE.value)
+        assert not CHARACTER.inventory.add_item(Items.BULLET_CARTRIDGE.value)
 
     def test_take_item(self, items_to_take: int = 3):
         Rooms.CORRIDOR.value.loot = Inventory({
@@ -102,11 +102,11 @@ class TestInventory(Test):
 
     def test_equip_ranged_weapon(self):
         CHARACTER.ranged_weapon = None
-        CHARACTER.inventory.add_item(Items.GUN.value)
+        CHARACTER.inventory.add_item(Items.PISTOL.value)
         execute_commands(commands=[
-            f"equip {Items.GUN.value.name}"
+            f"equip {Items.PISTOL.value.name}"
         ])
-        assert CHARACTER.ranged_weapon == Items.GUN.value
+        assert CHARACTER.ranged_weapon == Items.PISTOL.value
         assert len(CHARACTER.inventory) == 0
 
 
@@ -136,9 +136,9 @@ class TestItems(Test):
         assert CHARACTER.armor == 1
 
     def test_view_map(self):
-        CHARACTER.inventory.add_item(Items.MAP_HOME.value)
+        CHARACTER.inventory.add_item(Items.MAP_STREET_FULL.value)
         execute_commands(commands=[
-            f"view {Items.MAP_HOME.value.name}"
+            f"view {Items.MAP_STREET_FULL.value.name}"
         ])
 
 
@@ -179,7 +179,7 @@ class TestFighting(Test):
         CHARACTER.health = CHARACTER.max_health
         CHARACTER.luck = MAX_LUCK+1
         CHARACTER.room = Rooms.LOUNGE.value
-        CHARACTER.ranged_weapon = Items.GUN.value
+        CHARACTER.ranged_weapon = Items.PISTOL.value
         CHARACTER.ranged_weapon.ammunition = 1
         execute_commands(commands=[
             f"go {Rooms.KITCHEN.value.name}",

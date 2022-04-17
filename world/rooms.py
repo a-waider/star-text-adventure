@@ -1,4 +1,5 @@
 from enum import Enum
+from xml.dom.pulldom import CHARACTERS
 
 from classes.inventory import Inventory
 from classes.npc import NPC
@@ -6,6 +7,8 @@ from classes.room import Room
 from utilities import print
 
 from world.items import Items
+
+KILLS_TO_OPEN_MOTEL_ONE = 6  # TODO:Balancing
 
 
 def bedroom():
@@ -21,7 +24,7 @@ def corridor():
 
     if not Rooms.CORRIDOR.value.visited:
         print([
-            "Take the map to get an overview where you can go. Don't expect the map to be complete though."
+            "Take the map to get an overview where you can go."
         ])
         if not CHARACTER.inventory.add_item(Items.MAP_HOME.value):
             CHARACTER.room.loot.add_item(Items.MAP_HOME.value)
@@ -75,7 +78,14 @@ def gravestone():
     ])
 
 
-def neighbor_joe():
+def canal_street():
+    if not Rooms.CANAL_STREET.value.visited:
+        print([
+            "You are good friends with your neighbor Joe. Maybe you should check how he's doing."
+        ])
+
+
+def neighbor_joes_house():
     from main import CHARACTER
     if not Rooms.NEIGHBOR_JOES_HOUSE.value.visited:
         print([
@@ -89,16 +99,50 @@ Hopefully it can help you to stay alive and stop the zombie apocalypse. My fight
             "You stab a knife in his head to stop him from turning into a zombie."
         ])
         CHARACTER.kills += 1
-        if not CHARACTER.inventory.add_item(Items.MAP_STREET.value):
-            CHARACTER.room.loot.add_item(Items.MAP_STREET.value)
-            print([
-                "The item still lies in the house. You need to drop an item before you can take the map.",
-                f"Then view the map by typing: \"view {Items.MAP_STREET.value.name}\""
-            ])
-        else:
-            print([
-                f"Type \"view {Items.MAP_STREET.value.name}\" to view the map"
-            ])
+        CHARACTER.inventory.add_item(Items.MAP_STREET_BLURRED.value)
+        print([
+            "Oh no, the map isn't in good condition. Some parts are not visible.",
+            f"Type \"view {Items.MAP_STREET_BLURRED.value.name}\" to view the map"
+        ])
+
+
+def hairy_barber():
+    from main import CHARACTER
+
+    if not Rooms.HAIRY_BARBER.value.visited:
+        print([
+            f"Barber: {CHARACTER}, haven't seen you in a long time. \
+But your beard looks really good. Did you betray me??",
+            "You: No, no. I would never betray you.",
+            "Barber: If you say so.",
+            "You: Did you see the zombies running around on the streets?",
+            "Barber: Yes, they also tried to get into my store. Probably to get a fresh new haircut. \
+*whispering* But I don't think they have money with them. *whispering*",
+            "You: Seems reasonable to me. \
+Any chance you have something to reverse the process from truning into a zombie?",
+            f"Barber: I'm afraid not, but take my {Items.SCISSORS.value}. It might help you in your next fight.",
+        ])
+        CHARACTER.inventory.add_item(Items.MAP_STREET_BLURRED.value)
+        print([
+            "You: Thanks, I might just throw it into the next trash bin. ;)",
+        ])
+
+
+def newman_row():
+    from main import CHARACTER
+
+    if CHARACTER.kills >= KILLS_TO_OPEN_MOTEL_ONE:  # TODO: Define how many kills needed
+        print([
+            f"The door to to {Rooms.MOTEL_ONE.value} opened."
+        ])
+
+
+def motel_one():
+    # TODO
+    if not Rooms.MOTEL_ONE.value.visited:
+        print([
+            "You found a shelter of some humans."
+        ])
 
 
 class Rooms(Enum):
@@ -147,12 +191,12 @@ class Rooms(Enum):
         locked=True,
         lock_message="You couldn't find any key for the garage. It has to open up differently...",
         loot=Inventory({
-            Items.GUN.value: 1,
+            Items.PISTOL.value: 1,
             Items.COIN.value: 10,
         }),
         items_to_buy=Inventory({
             Items.ARMOR.value: 1,
-            Items.BULLET_MAGAZINE.value: 2,
+            Items.BULLET_CARTRIDGE.value: 2,
             Items.HEALING_POTION.value: 5,
         }))
     GRAVESTONE: Room = Room(
@@ -171,10 +215,11 @@ class Rooms(Enum):
             base_damage=5,
             loot=Inventory({
                 Items.COIN.value: 3
-            })))
+            })),
+        enter_room_function=canal_street)
     NEIGHBOR_JOES_HOUSE: Room = Room(
         name="Neighbor Joe's house",
-        enter_room_function=neighbor_joe)
+        enter_room_function=neighbor_joes_house)
     CREEPY_NEIGHBORS_HOUSE: Room = Room(
         name="Creepy neighbor's house",
         npc=NPC(
@@ -208,12 +253,92 @@ class Rooms(Enum):
             loot=Inventory({
                 Items.COIN.value: 2
             })))
+    REWE_TO_GO: Room = Room(
+        name="REWE to go",
+        loot=Inventory({
+            Items.COIN.value: 12
+        }),
+        items_to_buy=Inventory({
+            Items.APPLE.value: 2,
+            Items.BANANA.value: 4,
+            Items.EGGPLANT.value: 7,
+            Items.PRETZEL.value: 3
+        }))
+    CATHETRAL: Room = Room(
+        name="Cathetral",
+        npc=NPC(
+            name="Priest",
+            max_health=90,
+            armor=10,
+            base_damage=13,
+            krit_damage=20,
+            krit_chance=0.75,
+            loot=Inventory({
+                Items.COIN.value: 9
+            })),
+        loot=Inventory({
+            Items.MAP_STREET_FULL.value: 1
+        }))
+    CATACOMB: Room = Room(
+        name="Catacomb",
+        npc=NPC(
+            name="Monk",
+            max_health=60,
+            base_damage=10,
+            krit_damage=15,
+            krit_chance=0.4),
+        loot=Inventory({
+            Items.AK_47.value: 1
+        }))
+    HAIRY_BARBER: Room = Room(
+        name="Hairy barber",
+        locked=True,
+        lock_message="The door to the Hairy barber store is still locked. But you can't find a key anywhere.",
+        enter_room_function=hairy_barber,
+        respawn_point=True)
+    BATHROOM: Room = Room(
+        name="Bathroom",
+        loot=Inventory({
+            Items.COIN.value: 3
+        }))
+    WILSON_GROVE: Room = Room(
+        name="Wilson grove",
+        npc=NPC(
+            name="Zombie",
+            max_health=50,
+            base_damage=13,
+            krit_damage=17,
+            krit_chance=0.8,
+            loot=Inventory({
+                Items.COIN.value: 8
 
-    @staticmethod
+            })),
+        loot=Inventory({
+            Items.BULLET_CARTRIDGE.value: 3
+        }))
+    NEWMAN_ROW: Room = Room(
+        name="Newman row",
+        npc=NPC(
+            name="Zombie",
+            base_damage=25,
+            krit_damage=28,
+            krit_chance=0.9,
+            loot=Inventory({
+                Items.ARMOR.value: 8
+            })),
+        enter_room_function=newman_row)
+    MOTEL_ONE: Room = Room(
+        name="Motel ONE",
+        respawn_point=True,
+        locked=True,
+        lock_message=f"You need to kill {KILLS_TO_OPEN_MOTEL_ONE} zombies to enter motel ONE.",
+        enter_room_function=motel_one)
+
+    @ staticmethod
     def to_json() -> list:
         return [room.value.to_json() for room in Rooms]
 
-    @staticmethod
+    @ staticmethod
     def get_room_by_name(name: str) -> Room:
         rooms: 'list[Room]' = [
             item.value for item in Rooms]
@@ -239,7 +364,14 @@ room_connections: 'list[list[Room]]' = [
     [Rooms.CANAL_STREET.value, Rooms.NEIGHBOR_JOES_HOUSE.value],
     [Rooms.CANAL_STREET.value, Rooms.CREEPY_NEIGHBORS_HOUSE.value],
     [Rooms.CANAL_STREET.value, Rooms.PRINCESS_MAGDALENA_GARDEN.value],
-    [Rooms.CANAL_STREET.value, Rooms.MONTANA_AVENUE.value]
+    [Rooms.CANAL_STREET.value, Rooms.MONTANA_AVENUE.value],
+    [Rooms.CANAL_STREET.value, Rooms.WILSON_GROVE.value],
+    [Rooms.MONTANA_AVENUE.value, Rooms.REWE_TO_GO.value],
+    [Rooms.MONTANA_AVENUE.value, Rooms.CATHETRAL.value],
+    [Rooms.CATHETRAL.value, Rooms.CATACOMB.value],
+    [Rooms.MONTANA_AVENUE.value, Rooms.HAIRY_BARBER.value],
+    [Rooms.MONTANA_AVENUE.value, Rooms.NEWMAN_ROW.value],
+    [Rooms.NEWMAN_ROW.value, Rooms.MOTEL_ONE.value],
 ]
 
 
