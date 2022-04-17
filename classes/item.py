@@ -156,8 +156,11 @@ class WeaponRanged(Weapon):
         return None
 
     def attack(self) -> int:
+        from world.items import Items
+
         if self.ammunition > 0:
             self.ammunition -= 1
             return super().attack()
-        print("You have no more ammunition.")
+        print(
+            f"You have no more ammunition. You can refill it with the appropriate ammunition e.g. for the {Items.GUN.value} type \"use {Items.BULLET_MAGAZINE.value.name}\".")
         return None
