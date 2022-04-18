@@ -18,7 +18,7 @@ def print(text: 'list[str]' = "", sleep_time: int = 0.01):
         for sentence in text:
             text_print(sentence)
             if not TEST_MODE[0]:
-                input(" <enter>")
+                input(" <press enter>")
     elif isinstance(text, str):
         text_print(text)
         print()

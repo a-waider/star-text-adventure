@@ -75,11 +75,17 @@ class Room:
             print(f"{self.lock_message}\n")
             return
         if self.npc:
-            print(f"----- {self.npc} -----")
+            if CHARACTER.kills == 0:
+                print([
+                    f"You approach your first enemy. \
+Attack {self.npc} by typing \"attack melee\" or \"attack ranged\""
+                ])
+            max_name_length = max(len(self.npc.name), len(CHARACTER.name))
+            print(f"----- {str(self.npc).center(max_name_length)} -----")
             print(self.npc.fighting_stats())
-            print(f"----- {CHARACTER} -----")
+            print(f"----- {str(CHARACTER).center(max_name_length)} -----")
             print(CHARACTER.fighting_stats())
-            print("-----")
+            print("-"*int(12+max_name_length))
             return
         if self.enter_room_function:
             self.enter_room_function()
@@ -99,7 +105,7 @@ class Room:
         ])
         for item, price in self.items_to_buy.items():
             ret.append(f"{str(item):20}{price:10}")
-        ret.append("-----")
+        ret.append("-"*int(17+len(self.name)))
         return "\n".join(ret)
 
     def get_connected_rooms(self) -> 'list[Room]':
@@ -113,4 +119,4 @@ class Room:
                 elif self == room_connection[1]:
                     connected_rooms.add(room_connection[0])
 
-        return connected_rooms
+        return [connected_room for connected_room in connected_rooms if not connected_room.locked]

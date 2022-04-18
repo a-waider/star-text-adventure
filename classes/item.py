@@ -73,10 +73,10 @@ class Weapon(Item):
             plural: str = "",
             icon: str = "",
             base_damage: int = 0,
-            damage_variation: float = 0):
+            max_extra_damage: int = 0):
         super().__init__(name, plural, icon)
         self.base_damage: int = base_damage
-        self.damage_variation: float = damage_variation
+        self.max_extra_damage: int = max_extra_damage
 
     def to_json(self) -> dict:
         return {
@@ -84,7 +84,7 @@ class Weapon(Item):
             "plural": self.plural,
             "icon": self.icon,
             "base_damage": self.base_damage,
-            "damage_variation": self.damage_variation
+            "max_extra_damage": self.max_extra_damage
         }
 
     @staticmethod
@@ -95,12 +95,12 @@ class Weapon(Item):
                 plural=json_object["plural"],
                 icon=json_object["icon"],
                 base_damage=json_object["base_damage"],
-                damage_variation=json_object["damage_variation"],
+                max_extra_damage=json_object["max_extra_damage"],
             )
         return None
 
     def attack(self) -> int:
-        return self.base_damage + random.randint(0, self.damage_variation)
+        return self.base_damage + random.randint(0, self.max_extra_damage)
 
     @staticmethod
     def get_weapon_by_name(name: str) -> 'Weapon':
@@ -123,7 +123,8 @@ class WeaponMelee(Weapon):
                 name=weapon.name,
                 plural=weapon.plural,
                 icon=weapon.icon,
-                base_damage=weapon.base_damage)
+                base_damage=weapon.base_damage,
+                max_extra_damage=weapon.max_extra_damage)
         return None
 
 
@@ -133,9 +134,9 @@ class WeaponRanged(Weapon):
                  plural: str = "",
                  icon: str = "",
                  base_damage: int = 0,
-                 damage_variation: float = 0,
+                 max_extra_damage: int = 0,
                  ammunition: int = 0):
-        super().__init__(name, plural, icon, base_damage, damage_variation)
+        super().__init__(name, plural, icon, base_damage, max_extra_damage)
         self.ammunition: int = ammunition
 
     def to_json(self) -> dict:
@@ -152,6 +153,7 @@ class WeaponRanged(Weapon):
                 plural=weapon.plural,
                 icon=weapon.icon,
                 base_damage=weapon.base_damage,
+                max_extra_damage=weapon.max_extra_damage,
                 ammunition=json_object["ammunition"])
         return None
 

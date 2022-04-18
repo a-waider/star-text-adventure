@@ -24,7 +24,7 @@ def bullet_cartridge(amount: int):
 
     if amount <= CHARACTER.inventory[Items.BULLET_CARTRIDGE.value]:
         if CHARACTER.ranged_weapon:
-            if CHARACTER.ranged_weapon in (Items.PISTOL.value, Items.AK_47.value):
+            if CHARACTER.ranged_weapon.name in (Items.PISTOL.value.name, Items.AK_47.value.name):
                 CHARACTER.inventory.remove_item(
                     Items.BULLET_CARTRIDGE.value, amount=amount)
                 CHARACTER.ranged_weapon.ammunition += amount
@@ -58,7 +58,7 @@ def apple(amount: int):
 
     from world.commands import show_statistics
 
-    gained_health_per_apple = amount
+    gained_health_per_apple = 2*amount
 
     CHARACTER.inventory.remove_item(Items.APPLE.value, amount=amount)
     CHARACTER.add_health(amount*gained_health_per_apple)
@@ -71,7 +71,7 @@ def banana(amount: int):
 
     from world.commands import show_statistics
 
-    gained_health_per_banana = amount
+    gained_health_per_banana = 4*amount
 
     CHARACTER.inventory.remove_item(Items.BANANA.value, amount=amount)
     CHARACTER.add_health(amount*gained_health_per_banana)
@@ -80,8 +80,11 @@ def banana(amount: int):
 
 
 def eggplant(amount: int):
+    from main import CHARACTER
+
     print(f"The {Items.EGGPLANT.value} can't boost your health. \
 Instead your sex appeal increases enormously.")
+    CHARACTER.inventory.remove_item(Items.EGGPLANT.value)
 
 
 def pretzel(amount: int):
@@ -89,7 +92,7 @@ def pretzel(amount: int):
 
     from world.commands import show_statistics
 
-    gained_health_per_pretzel = amount
+    gained_health_per_pretzel = 3*amount
 
     CHARACTER.inventory.remove_item(Items.PRETZEL.value, amount=amount)
     CHARACTER.add_health(amount*gained_health_per_pretzel)
@@ -100,10 +103,32 @@ def pretzel(amount: int):
 def antidote(amount: int):
     from main import CHARACTER
 
-    from world.commands import show_statistics
+    from world.rooms import Rooms
 
-    # TODO
-    pass
+    if CHARACTER.inventory[Items.ANTIDOTE.value] > 1:
+        CHARACTER.inventory[Items.ANTIDOTE.value] = 1
+        print("Don't try to trick the game ;)")
+        return
+    if CHARACTER.room.npc:
+        if CHARACTER.room == Rooms.BOSSFIGHT_ARENA.value:
+            print("The Antidote doesn't work against The zombie boss.")
+        else:
+            print(
+                f"You healed {CHARACTER.room.npc}. {CHARACTER.room.npc} is no longer a thread.")
+            CHARACTER.inventory.remove_item(Items.ANTIDOTE.value)
+            CHARACTER.cures += 1
+            CHARACTER.room.npc = None
+
+
+def holy_scepter(amount: int):
+    from main import CHARACTER
+
+    armor_gained_by_holy_scepter = 40
+
+    CHARACTER.inventory.remove_item(
+        Items.HOLY_SCEPTER.value, CHARACTER.inventory[Items.HOLY_SCEPTER.value])
+    CHARACTER.armor += armor_gained_by_holy_scepter
+    print(f"You have now {CHARACTER.armor} {Items.ARMOR.value}.")
 
 
 def key_front_door(amount: int):
@@ -126,9 +151,24 @@ def lockpicker(amount: int):
 
     if CHARACTER.room == Rooms.FRONT_YARD.value:
         Rooms.GARAGE.value.locked = False
-        print("The garage door has been unlocked")
+        print(f"The door to {Rooms.GARAGE.value} has been unlocked.")
+    elif CHARACTER.room in (Rooms.MONTANA_AVENUE.value, Rooms.NEWMAN_ROW.value):
+        Rooms.HAIRY_BARBER.value.locked = False
+        print(f"The door to {Rooms.HAIRY_BARBER.value} has been unlocked")
     else:
-        print("The Lockpicker doesn't work in this room")
+        print("The Lockpicker doesn't work in this room.")
+
+
+def key_motel_one(amount: int):
+    from main import CHARACTER
+
+    from world.rooms import KILLS_TO_OPEN_MOTEL_ONE, Rooms
+    if CHARACTER.room == Rooms.NEWMAN_ROW.value:
+        Rooms.MOTEL_ONE.value.locked = False
+        print(f"You have shown yourself worthy to enter {Rooms.MOTEL_ONE.value} \
+by killing {KILLS_TO_OPEN_MOTEL_ONE} zombies.")
+    else:
+        print(f"You can't go to {Rooms.MOTEL_ONE.value} from here.")
 
 
 def _room_string(room: Room, blurred: bool = False) -> str:
@@ -159,7 +199,7 @@ def map_home():
 {_room_string(Rooms.LIVING_ROOM.value)}----{_room_string(Rooms.CORRIDOR.value)}----{_room_string(Rooms.LOUNGE.value)}----{_room_string(Rooms.KITCHEN.value)}
 {" "*room_name_length}    {"|".center(room_name_length)}
 {" "*room_name_length}    {"|".center(room_name_length)}
-{" "*room_name_length}    {_room_string(Rooms.FRONT_YARD.value)}
+{_room_string(Rooms.GRAVESTONE.value)}----{_room_string(Rooms.FRONT_YARD.value)}----{_room_string(Rooms.GARAGE.value)}
 """, sleep_time=0.0001)
 
 
@@ -173,20 +213,27 @@ def map_street_blurred(blurred: bool = True):
 
     tmp = "\\"
     print(f"""
-{" "*int(0.6*room_name_length)}  {_room_string(Rooms.NEIGHBOR_JOES_HOUSE.value)}  {_room_string(Rooms.CREEPY_NEIGHBORS_HOUSE.value)}{_room_string(Rooms.REWE_TO_GO.value, blurred=blurred)}
-{" "*int(1.35*room_name_length)}\\ {"".center(int(room_name_length/2))} /{" "*room_name_length} /
-{" "*int(1.35*room_name_length)} \\{"".center(int(room_name_length/2))}/ {" "*room_name_length}/
+{" "*int(0.6*room_name_length)}  {_room_string(Rooms.NEIGHBOR_JOES_HOUSE.value)}  {_room_string(Rooms.CREEPY_NEIGHBORS_HOUSE.value)}{_room_string(Rooms.REWE_TO_GO.value, blurred=blurred)}{_room_string(Rooms.SACRISTY.value, blurred=blurred)}
+{" "*int(1.35*room_name_length)}\\ {"".center(int(room_name_length/2))} /{" "*room_name_length} /{" "*room_name_length} /
+{" "*int(1.35*room_name_length)} \\{"".center(int(room_name_length/2))}/ {" "*room_name_length}/ {" "*room_name_length}/
 {_room_string(Rooms.FRONT_YARD.value)}----{_room_string(Rooms.CANAL_STREET.value)}----{_room_string(Rooms.MONTANA_AVENUE.value)}----{_room_string(Rooms.CATHETRAL.value)}----{_room_string(Rooms.CATACOMB.value, blurred=blurred)}
 {" "*room_name_length}    {"|".center(room_name_length)}    {"|".center(room_name_length)}
 {" "*room_name_length}   {"/".center(room_name_length)}      {tmp.center(room_name_length)}
 {_room_string(Rooms.PRINCESS_MAGDALENA_GARDEN.value, blurred=blurred)} {"--<".center(room_name_length)}          {">--".center(room_name_length)} {_room_string(Rooms.HAIRY_BARBER.value)}----{_room_string(Rooms.BATHROOM.value)}
-{" "*room_name_length}   {tmp.center(room_name_length)}      {"/".center(room_name_length)}
-{" "*room_name_length}    {"|".center(room_name_length)}    {"|".center(room_name_length)}
-{" "*room_name_length}    {_room_string(Rooms.WILSON_GROVE.value, blurred=blurred)}----{_room_string(Rooms.NEWMAN_ROW.value)}----{_room_string(Rooms.MOTEL_ONE.value, blurred=blurred)}
+{" "*room_name_length if blurred else "|".center(room_name_length)}   {tmp.center(room_name_length)}      {"/".center(room_name_length)}
+{" "*room_name_length if blurred else "|".center(room_name_length)}    {"|".center(room_name_length)}    {"|".center(room_name_length)}
+{" "*room_name_length if blurred else _room_string(Rooms.BOSSFIGHT_ARENA.value)}    {_room_string(Rooms.WILSON_GROVE.value, blurred=blurred)}----{_room_string(Rooms.NEWMAN_ROW.value)}----{_room_string(Rooms.MOTEL_ONE.value, blurred=blurred)}
 """, sleep_time=0.0001)
 
 
 def map_street_full():
+    from world.rooms import Rooms
+
+    Rooms.REWE_TO_GO.value.locked = False
+    Rooms.SACRISTY.value.locked = False
+    Rooms.CATACOMB.value.locked = False
+    Rooms.PRINCESS_MAGDALENA_GARDEN.value.locked = False
+    Rooms.WILSON_GROVE.value.locked = False
     map_street_blurred(blurred=False)
 
 
@@ -234,7 +281,14 @@ class Items(Enum):
         name="Antidote",
         plural="Antidotes",
         icon="💉",
-        use_function=antidote)
+        use_function=antidote,
+        use_on_pickup=True)
+    HOLY_SCEPTER: Item = Item(
+        name="Scepter",
+        plural="Scepters",
+        icon="👑",
+        use_function=holy_scepter,
+        use_on_pickup=True)
 
     # Keys
     KEY_HOME: Item = Item(
@@ -245,6 +299,10 @@ class Items(Enum):
         name="Lockpicker",
         icon="🔒",
         use_function=lockpicker)
+    KEY_MOTEL_ONE: Item = Item(
+        name="Key motel ONE",
+        icon="🔑",
+        use_function=key_motel_one)
 
     # Maps
     MAP_HOME: Map = Map(
@@ -264,34 +322,34 @@ class Items(Enum):
     REMOTE: WeaponMelee = WeaponMelee(
         name="Remote",
         base_damage=5,
-        damage_variation=1)
+        max_extra_damage=1)
     KNIFE: WeaponMelee = WeaponMelee(
         name="Knife",
         icon="🔪",
         base_damage=15,
-        damage_variation=7)
+        max_extra_damage=7)
     AXE: WeaponMelee = WeaponMelee(
         name="Axe",
         icon="🪓",
         base_damage=25,
-        damage_variation=10)
+        max_extra_damage=10)
     PISTOL: WeaponRanged = WeaponRanged(
         name="Pistol",
         icon="🔫",
         base_damage=12,
-        damage_variation=15,
+        max_extra_damage=15,
         ammunition=3)
     AK_47: WeaponRanged = WeaponRanged(
         name="AK-47",
         icon="",
         base_damage=22,
-        damage_variation=8,
+        max_extra_damage=8,
         ammunition=6)
     SCISSORS: WeaponMelee = WeaponMelee(
         name="Scissors",
         icon="",
         base_damage=8,
-        damage_variation=2)
+        max_extra_damage=2)
 
     @ staticmethod
     def get_item_by_name(name: str) -> Item:

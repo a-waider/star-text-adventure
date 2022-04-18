@@ -1,10 +1,11 @@
 import random
+from typing import Tuple
 
 from termcolor import colored
 from utilities import colored_health
 
 from classes.inventory import Inventory
-from classes.item import Item
+from classes.item import Item, Weapon
 
 DEFAULT_MAX_HEALTH = 100
 DEFAULT_HEALTH = None
@@ -38,6 +39,10 @@ class NPC:
     def __str__(self):
         return colored(self.name, color="red")
 
+    def __bool__(self):
+        """Returns True if the npc is alive else False."""
+        return self.health > 0
+
     def to_json(self):
         return {
             "name": self.name,
@@ -63,23 +68,29 @@ class NPC:
             loot=Inventory.from_json(json_object["loot"])
         ) if json_object else None
 
-    def attack(self) -> int:
-        rand = random.random()
-        # TODO: probably logical error
-        if self.krit_chance < rand:
-            return int(self.base_damage)
-        return int(self.krit_damage)
+    def attack(self) -> 'Tuple[int, bool]':
+        if random.random() > (1-self.krit_chance):
+            return int(self.krit_damage), True
+        return int(self.base_damage), False
 
     def defend(self, damage: int):
-        self.armor = max(self.armor - damage*0.25, 0)
+        from main import CHARACTER
+
         if self.armor == 0:
             self.health = max(self.health-damage, 0)
         else:
             self.health = max(self.health-int(damage / self.armor * 10), 0)
+        self.armor = max(self.armor - damage*0.25, 0)
+        if self.health <= 0:
+            CHARACTER.kills += 1
+            print(f"You defeated {self}.")
+            for item, amount in self.loot.items():
+                CHARACTER.room.loot.add_item(item, amount)
+            CHARACTER.room.npc = None
 
-    def fighting_stats(self, prev_health: int = None, prev_armor: int = None) -> str:
+    def fighting_stats(self, prev_health: int = None, prev_armor: int = None, weapon: Weapon = None) -> str:
         heart_icon, health_color = colored_health(self.health, self.max_health)
-        health_lost_string: str = f"{prev_health} - {prev_health-self.health} = " if prev_health else ""
+        health_lost_string: str = f"{prev_health} - {prev_health-self.health}  ({weapon}) = " if prev_health else ""
         armor_damage_string: str = f"{prev_armor} - {prev_armor-self.armor} = " if prev_armor else ""
         return f"""{'Health: ':15}{heart_icon} {health_lost_string}\
 {colored(f'{self.health} / {self.max_health}', health_color)}

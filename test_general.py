@@ -2,7 +2,7 @@ from classes.inventory import Inventory
 from classes.npc import NPC
 from classes.person import MAX_LUCK
 from main import CHARACTER, main
-from world.items import Items
+from world.items import Items, antidote
 from world.rooms import Rooms
 
 
@@ -24,6 +24,21 @@ class Test:
 
 
 class TestMovement(Test):
+    def test_unlock_front_door(self):
+        Rooms.FRONT_YARD.value.locked = True
+        CHARACTER.room = Rooms.CORRIDOR.value
+        CHARACTER.inventory.add_item(Items.KEY_HOME.value)
+        execute_commands(commands=[
+            f"use {Items.KEY_HOME.value.name}"
+        ])
+        assert Rooms.FRONT_YARD.value.locked is False
+        assert Items.KEY_HOME.value not in CHARACTER.inventory
+        execute_commands(commands=[
+            f"go {Rooms.FRONT_YARD.value.name}"
+        ])
+        assert CHARACTER.room == Rooms.FRONT_YARD.value
+        Rooms.FRONT_YARD.value.locked = True
+
     def test_cant_go_to_locked_room(self):
         CHARACTER.room = Rooms.CORRIDOR.value
         execute_commands(commands=[
@@ -31,6 +46,23 @@ class TestMovement(Test):
         ])
         assert CHARACTER.room == Rooms.CORRIDOR.value
         assert Rooms.FRONT_YARD.value.locked is True
+
+    def test_unlock_motel_one(self):
+        from world.rooms import KILLS_TO_OPEN_MOTEL_ONE
+
+        Rooms.MOTEL_ONE.value.locked = True
+        Rooms.NEWMAN_ROW.value.npc = None
+        Rooms.MONTANA_AVENUE.value.npc = None
+        CHARACTER.room = Rooms.MONTANA_AVENUE.value
+        CHARACTER.kills = KILLS_TO_OPEN_MOTEL_ONE
+        execute_commands(commands=[
+            f"go {Rooms.NEWMAN_ROW.value.name}"
+        ])
+        assert Rooms.MOTEL_ONE.value.locked is False
+        execute_commands(commands=[
+            f"go {Rooms.MOTEL_ONE.value.name}"
+        ])
+        assert CHARACTER.room == Rooms.MOTEL_ONE.value
 
     def test_update_respawn_point(self):
         CHARACTER.room = Rooms.CORRIDOR.value
@@ -111,29 +143,46 @@ class TestInventory(Test):
 
 
 class TestItems(Test):
-    def test_unlock_front_door(self):
-        Rooms.FRONT_YARD.value.locked = True
-        CHARACTER.room = Rooms.CORRIDOR.value
-        CHARACTER.inventory.add_item(Items.KEY_HOME.value)
-        execute_commands(commands=[
-            f"use {Items.KEY_HOME.value.name}"
-        ])
-        assert Rooms.FRONT_YARD.value.locked is False
-        assert Items.KEY_HOME.value not in CHARACTER.inventory
-        execute_commands(commands=[
-            f"go {Rooms.FRONT_YARD.value.name}"
-        ])
-        assert CHARACTER.room == Rooms.FRONT_YARD.value
-        Rooms.FRONT_YARD.value.locked = True
-
     def test_use_on_pickup(self):
         CHARACTER.room = Rooms.GARAGE.value
         CHARACTER.inventory.add_item(Items.COIN.value, 100)
-        assert CHARACTER.armor == 0
+        CHARACTER.armor = 0
         execute_commands(commands=[
             f"buy {Items.ARMOR.value.name}"
         ])
         assert CHARACTER.armor == 1
+
+    def test_holy_scepter(self):
+        CHARACTER.room.loot.add_item(Items.HOLY_SCEPTER.value)
+        CHARACTER.armor = 0
+        execute_commands(commands=[
+            f"take {Items.HOLY_SCEPTER.value.name}"
+        ])
+        assert CHARACTER.armor == 40
+
+    def test_antidote(self):
+        CHARACTER.room = Rooms.MONTANA_AVENUE.value
+        CHARACTER.room.npc = None
+        Rooms.CATHETRAL.value.npc = NPC(name="Dummy")
+        CHARACTER.inventory.add_item(Items.ANTIDOTE.value)
+        CHARACTER.cures = 0
+        execute_commands(commands=[
+            f"go {Rooms.CATHETRAL.value.name}",
+            f"use {Items.ANTIDOTE.value.name}"
+        ])
+        assert Rooms.CATHETRAL.value.npc is None
+        assert Items.ANTIDOTE.value not in CHARACTER.inventory
+        assert CHARACTER.cures == 1
+
+    def test_max_1_antidote_in_inventory(self):
+        CHARACTER.room.loot = Inventory({
+            Items.ANTIDOTE.value: 1
+        })
+        CHARACTER.inventory.add_item(Items.ANTIDOTE.value)
+        execute_commands(commands=[
+            f"take {Items.ANTIDOTE.value.name}"
+        ])
+        assert CHARACTER.inventory[Items.ANTIDOTE.value] == 1
 
     def test_view_map(self):
         CHARACTER.inventory.add_item(Items.MAP_STREET_FULL.value)

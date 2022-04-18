@@ -28,24 +28,22 @@ class Inventory(dict):
 
         if item in self:
             self[item] += amount
-            print(
-                f"Added {item.__str__(amount=amount)} to your inventory.")
-            return True
-        if self.max_items is None or (self.max_items is not None and len(self) < self.max_items):
+        elif self.max_items is None or (self.max_items is not None and len(self) < self.max_items):
             self[item] = amount
+        else:
             if self == CHARACTER.inventory:
-                if item.use_on_pickup:
-                    item.use(amount)
-                else:
-                    print(
-                        f"Added {item.__str__(amount=amount)} to your inventory.")
-            return True
-        if self == CHARACTER.inventory:
-            print(
-                f"Couldn't add {item.__str__(amount=amount)} to your inventory. \
+                print(
+                    f"Couldn't add {item.__str__(amount=amount)} to your inventory. \
 The maximum capacity of {self.max_items} item types is reached. It dropped in the room.")
-        CHARACTER.room.loot.add_item(item, amount)
-        return False
+                CHARACTER.room.loot.add_item(item, amount)
+            return False
+        if self == CHARACTER.inventory:
+            if item.use_on_pickup:
+                item.use(amount)
+            else:
+                print(
+                    f"Added {item.__str__(amount=amount)} to your inventory.")
+        return True
 
     def remove_item(self, item: Item, amount: int = 1) -> bool:
         if item in self:

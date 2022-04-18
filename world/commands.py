@@ -27,7 +27,7 @@ def help_menu(args: 'list[str]'):
             print(
                 f"{command.value.keyword:20}{' '.join([f'<{arg}>' for arg in command.value.args]):19}\
 {command.value.description:70}{', '.join(command.value.aliases):20}", sleep_time=sleep_time)
-    print("-----", sleep_time=sleep_time)
+    print("-"*16, sleep_time=sleep_time)
 
 
 def show_statistics(args: 'list[str]' = None):
@@ -37,7 +37,7 @@ def show_statistics(args: 'list[str]' = None):
     print(f"----- {trailing_s(CHARACTER)} Statistics -----",
           sleep_time=sleep_time)
     print(f"{CHARACTER.stats()}", sleep_time=sleep_time)
-    print("-----", sleep_time=sleep_time)
+    print("-"*int(23+len(trailing_s(CHARACTER))), sleep_time=sleep_time)
 
 
 def show_inventory(args: 'list[str]'):
@@ -52,7 +52,7 @@ def show_inventory(args: 'list[str]'):
               sleep_time=sleep_time)
     for item, amount in CHARACTER.inventory.items():
         print(f"{item.__str__(amount=amount)}", sleep_time=sleep_time)
-    print("-----")
+    print("-"*int(23+len(trailing_s(CHARACTER))))
 
 
 def buy(args: 'list[str]'):
@@ -103,7 +103,8 @@ def drop(args: 'list[str]'):
     item = Items.get_item_by_name(item_name)
     if item in CHARACTER.inventory:
         amount = CHARACTER.inventory[item]
-    elif item.name in (CHARACTER.melee_weapon.name,  CHARACTER.ranged_weapon.name):
+    elif item and ((CHARACTER.melee_weapon and item.name == CHARACTER.melee_weapon.name)
+                   or (CHARACTER.ranged_weapon and item.name == CHARACTER.ranged_weapon.name)):
         amount = 1
     else:
         print("You can't drop an item you don't have in your inventory.")
@@ -171,6 +172,9 @@ def go(args: 'list[str]'):
 
     current_room: Room = CHARACTER.room
     next_room: Room = Rooms.get_room_by_name(" ".join(args))
+    if CHARACTER.room == next_room:
+        print(f"You are already in {CHARACTER.room}.")
+        return
     for room_connection in room_connections:
         if current_room in room_connection and next_room in room_connection:
             if next_room.locked:
@@ -185,10 +189,13 @@ def go(args: 'list[str]'):
 def equip(args: 'list[str]'):
     from main import CHARACTER
 
-    weapon = Weapon.get_weapon_by_name(" ".join(args))
-    if weapon in CHARACTER.inventory.keys():
-        if CHARACTER.inventory[weapon] > 1:
-            raise Exception("Should never enter this branch")
+    weapon = [item for item in CHARACTER.inventory if isinstance(item, Weapon) and
+              item.name.lower() == " ".join(args).lower()]
+    if weapon:
+        weapon = weapon[0]
+        print(
+            f"You have now {weapon} equipped as {'melee' if isinstance(weapon, WeaponMelee) else 'ranged'} weapon.")
+        CHARACTER.inventory.remove_item(weapon)
         if isinstance(weapon, WeaponMelee):  # Melee Weapon
             if CHARACTER.melee_weapon:
                 CHARACTER.inventory.add_item(CHARACTER.melee_weapon)
@@ -197,9 +204,6 @@ def equip(args: 'list[str]'):
             if CHARACTER.ranged_weapon:
                 CHARACTER.inventory.add_item(CHARACTER.ranged_weapon)
             CHARACTER.ranged_weapon = weapon
-        CHARACTER.inventory.remove_item(weapon)
-        print(
-            f"You have now {weapon} equipped.")
     else:
         print(f"You can't equip {' '.join(args)}")
 
@@ -220,11 +224,10 @@ def inspect(args: 'list[str]'):
     if weapon and weapon.name in weapons:
         print(f"----- {weapon} -----")
         print(f"Base damage: {weapon.base_damage}")
-        # TODO: Maybe rename to krit damage
-        print(f"Damage variation: {weapon.damage_variation}")
+        print(f"Maximum extra damage: {weapon.max_extra_damage}")
         if isinstance(weapon, WeaponRanged):
-            print(f"Ammunition: {CHARACTER.ranged_weapon.ammunition}")
-        print("-----")
+            print(f"Ammunition: {weapon.ammunition}")
+        print("-"*int(12+len(weapon.name)))
     else:
         print("You don't have this weapon equipped or in your inventory.")
 
@@ -236,16 +239,24 @@ def attack(args: 'list[str]'):
 
     npc: NPC = CHARACTER.room.npc
     if npc:
-        if args[0] == "melee":
-            weapon = CHARACTER.melee_weapon
-        elif args[0] == "ranged":
-            weapon = CHARACTER.ranged_weapon
+        if args and args[0] == "melee":
+            if CHARACTER.melee_weapon:
+                weapon = CHARACTER.melee_weapon
+            else:
+                print("You don't have a melee weapon.")
+                return
+        elif args and args[0] == "ranged":
+            if CHARACTER.ranged_weapon:
+                weapon = CHARACTER.ranged_weapon
+            else:
+                print("You don't have a ranged weapon.")
+                return
         else:
             print(
                 "You must define which weapon type you want to use. Valid types are \"melee\" and \"ranged\".")
             return
         character_attack_damage = CHARACTER.attack(weapon=weapon)
-        npc_attack_damage = npc.attack()
+        npc_attack_damage, npc_attack_critical = npc.attack()
         character_prev_health = CHARACTER.health
         character_prev_armor = CHARACTER.armor
         npc_prev_health = npc.health
@@ -255,34 +266,29 @@ def attack(args: 'list[str]'):
         if CHARACTER.luck > random.randint(0, MAX_LUCK):
             print("You are lucky you can start attacking.")
             npc.defend(character_attack_damage)
-            if npc.health <= 0:
-                CHARACTER.kills += 1
-                print(f"You defeated {npc}.")
-                for item, amount in npc.loot.items():
-                    CHARACTER.room.loot.add_item(item, amount)
-                CHARACTER.room.npc = None
-                CHARACTER.room.enter_room()
-            else:
+            if npc.health > 0:
                 CHARACTER.defend(npc_attack_damage)
         else:
             print(f"{npc} starts attacking.")
             CHARACTER.defend(npc_attack_damage)
             if CHARACTER.health > 0:
                 npc.defend(character_attack_damage)
+        max_name_length = max(len(npc.name), len(CHARACTER.name))
+        print(f"----- {str(npc).center(max_name_length)} -----")
+        print(npc.fighting_stats(
+            prev_health=npc_prev_health, prev_armor=npc_prev_armor, weapon=weapon))
+        print(f"----- {str(CHARACTER).center(max_name_length)} -----")
+        print(CHARACTER.fighting_stats(
+            prev_health=character_prev_health, prev_armor=character_prev_armor, critical=npc_attack_critical))
+        print("-"*int(12+max_name_length))
         if CHARACTER.health <= 0:
             CHARACTER.deaths += 1
             CHARACTER.health = 100
             CHARACTER.room = CHARACTER.respawn_point
             print(
                 f"You have been killed by {npc} and respawn in {CHARACTER.room}")
-            create_savepoint()
-        print(f"----- {npc} -----")
-        print(npc.fighting_stats(
-            prev_health=npc_prev_health, prev_armor=npc_prev_armor))
-        print(f"----- {CHARACTER} -----")
-        print(CHARACTER.fighting_stats(
-            prev_health=character_prev_health, prev_armor=character_prev_armor))
-        print("-----")
+        if not CHARACTER.room.npc:
+            CHARACTER.room.enter_room()
     else:
         print("There are no npc's to fight.")
 
@@ -356,7 +362,7 @@ class Commands(Enum):
         command=where_am_i)
     WHERE_CAN_I_GO: Command = Command(
         "where can i go",
-        description="Shows the rooms you can enter from your current position",
+        description="Shows all unlocked rooms you can enter from your current room",
         command=where_can_i_go)
     GO: Command = Command(
         "go",
@@ -374,6 +380,7 @@ class Commands(Enum):
         description="Buys an item",
         valid_rooms=[
             Rooms.GARAGE.value,
+            Rooms.REWE_TO_GO.value
         ],
         command=buy)
     TAKE: Command = Command(

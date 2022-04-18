@@ -53,7 +53,7 @@ def main(test_mode: bool = False, user_commands: 'list[str]' = None):
                 "To beginn, please enter your character's name: ").strip()
             if CHARACTER.room == Rooms.BEDROOM.value:  # Beginning of story telling
                 print([
-                    "You wake up in your bed from a nightmare.",
+                    f"You wake up in your {Rooms.BEDROOM.value} from a nightmare.",
                     "Everything is still so fuzzy so you can't really see your surroundings."
                 ])
                 CHARACTER.room.enter_room_function()
@@ -70,7 +70,8 @@ def main(test_mode: bool = False, user_commands: 'list[str]' = None):
         valid_user_input = False
         for command in Commands:
             command: Command = command.value
-            if user_input.startswith(command.keyword) or [alias for alias in command.aliases if user_input.startswith(alias)]:
+            if user_input.startswith(command.keyword) or \
+                    [alias for alias in command.aliases if user_input.startswith(alias)]:
                 if user_input.startswith(command.keyword):
                     args = user_input.replace(
                         command.keyword, "", 1).strip().lower().split(" ")

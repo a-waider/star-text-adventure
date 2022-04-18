@@ -28,6 +28,7 @@ class Person:
             room: Room = Rooms.BEDROOM,
             respawn_point: Room = Rooms.BEDROOM,
             kills: int = 0,
+            cures: int = 0,
             deaths: int = 0):
         self.name: str = name
         self.health: int = health
@@ -43,6 +44,7 @@ class Person:
         self.room: Room = room
         self.respawn_point: Room = respawn_point
         self.kills: int = kills
+        self.cures: int = cures
         self.deaths: int = deaths
 
     def __str__(self) -> str:
@@ -50,16 +52,23 @@ class Person:
 
     def stats(self, ammunition: bool = False, prev_health: int = None, prev_armor: int = None):
         return f"""{self.fighting_stats(ammunition=ammunition, prev_health=prev_health, prev_armor=prev_armor)}
+{'Cures: ':15}💉 {self.cures}
 {'Luck: ':15}   {self.luck}"""
 
-    def fighting_stats(self, ammunition: bool = False, prev_health: int = None, prev_armor: int = None) -> str:
+    def fighting_stats(self,
+                       ammunition: bool = False,
+                       prev_health: int = None,
+                       prev_armor: int = None,
+                       critical: bool = False) -> str:
         heart_icon, health_color = colored_health(self.health, self.max_health)
-        health_lost_string: str = f"{prev_health} - {prev_health-self.health} = " if prev_health else ""
-        armor_damage_string: str = f"{prev_armor} - {prev_armor-self.armor} = " if prev_armor else ""
+        health_lost_string: str = f"{prev_health} - {prev_health-self.health} \
+{'(critical attack)' if critical else ''} = " if prev_health and prev_health != self.health else ""
+        armor_damage_string: str = f"{prev_armor} - {prev_armor-self.armor} \
+= " if prev_armor and prev_armor != self.armor else ""
         ret = f"""{'Health: ':15}{heart_icon} {health_lost_string}\
-{colored(f'{self.health} / {self.max_health}', health_color)}
+{colored(f'{max(self.health,0)} / {self.max_health}', health_color)}
 {'Armor: ':15}🛡  {armor_damage_string}{colored(self.armor, 'blue')}
-{'Kills: ':15}   {self.kills}
+{'Kills: ':15}🔪 {self.kills}
 {'Deaths: ':15}💀 {self.deaths}"""
         if ammunition:
             ret += f"\n{'Ammunition: ':15}: {self.ranged_weapon.ammunition}"
@@ -107,16 +116,12 @@ class Person:
 
     def attack(self, weapon: Weapon) -> int:
         if isinstance(weapon, WeaponMelee):
-            if self.melee_weapon:
-                return int(self.melee_weapon.attack() * self.intelligence / 100)
-            print("You don't have a melee weapon.")
-        elif isinstance(weapon, WeaponRanged):
-            if self.ranged_weapon:
-                try:
-                    return int(self.ranged_weapon.attack() * self.intelligence / 100)
-                except TypeError:
-                    return None
-            print("You don't have a ranged weapon.")
+            return int(self.melee_weapon.attack() * self.intelligence / 100)
+        if isinstance(weapon, WeaponRanged):
+            try:
+                return int(self.ranged_weapon.attack() * self.intelligence / 100)
+            except TypeError:
+                return None
         print("TODO: ")
         return None
 
@@ -127,11 +132,14 @@ class Person:
         return int(self.ranged_weapon.attack() * self.intelligence / 100)
 
     def defend(self, damage: int):
-        self.armor = max(self.armor - damage*0.25, 0)
         if self.armor == 0:
             self.health -= damage
         else:
-            self.health = max(self.health - int(damage / self.armor * 10), 0)
+            print()
+            for _ in range(int(self.armor)):
+                damage *= 0.98
+            self.health = max(self.health - int(damage), 0)
+        self.armor = max(self.armor - int(damage)*0.18, 0)
 
     def add_health(self, health_points: int):
         self.health = min(self.health+health_points, self.max_health)
