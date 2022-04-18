@@ -277,7 +277,7 @@ class Rooms(Enum):
             krit_damage=10,
             krit_chance=0.4,
             loot=Inventory({
-                Items.COIN.value: 10,
+                Items.COIN.value: 4,
                 Items.ARMOR.value: 8,
             })))
     PRINCESS_MAGDALENA_GARDEN: Room = Room(
@@ -301,12 +301,14 @@ class Rooms(Enum):
             max_health=10,
             base_damage=5,
             loot=Inventory({
-                Items.COIN.value: 2
+                Items.COIN.value: 5,
+                Items.ARMOR.value: 6
             })))
     REWE_TO_GO: Room = Room(
         name="REWE to go",
         loot=Inventory({
-            Items.COIN.value: 12
+            Items.COIN.value: 12,
+            Items.ARMOR.value: 5,
         }),
         locked=True,
         lock_message="You must first find the full map.",
@@ -329,7 +331,8 @@ class Rooms(Enum):
                 Items.COIN.value: 9
             })),
         loot=Inventory({
-            Items.MAP_STREET_FULL.value: 1
+            Items.MAP_STREET_FULL.value: 1,
+            Items.BULLET_CARTRIDGE.value: 2
         }))
     CATACOMB: Room = Room(
         name="Catacomb",
@@ -340,21 +343,28 @@ class Rooms(Enum):
             max_health=60,
             base_damage=10,
             krit_damage=15,
-            krit_chance=0.4),
+            krit_chance=0.4,
+            loot=Inventory({
+                Items.ARMOR.value: 5
+            })),
         loot=Inventory({
-            Items.AK_47.value: 1
+            Items.AK_47.value: 1,
         }))
     SACRISTY: Room = Room(
         name="Sacristy",
         locked=True,
         lock_message="You must first find the full map.",
         loot=Inventory({
-            Items.HOLY_SCEPTER.value: 1
+            Items.HOLY_SCEPTER.value: 1,
+            Items.COIN.value: 7
         }))
     HAIRY_BARBER: Room = Room(
         name="Hairy barber",
         locked=True,
         lock_message="The door to the Hairy barber store is still locked. But you can't find a key anywhere.",
+        loot=Inventory({
+            Items.COIN.value: 2
+        }),
         enter_room_function=hairy_barber)
     BATHROOM: Room = Room(
         name="Bathroom",
@@ -377,7 +387,7 @@ class Rooms(Enum):
 
             })),
         loot=Inventory({
-            Items.BULLET_CARTRIDGE.value: 3
+            Items.BULLET_CARTRIDGE.value: 5
         }))
     NEWMAN_ROW: Room = Room(
         name="Newman row",
