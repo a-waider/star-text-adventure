@@ -12,6 +12,7 @@ DEFAULT_RESPAWN_POINT = False
 DEFAULT_LOCKED = False
 DEFAULT_LOCK_MESSAGE = None
 DEFAULT_ITEMS_TO_BUY = None
+DEFAULT_ITEMS_TO_SELL = None
 
 
 class Room:
@@ -24,7 +25,8 @@ class Room:
                  locked: bool = DEFAULT_LOCKED,
                  lock_message: str = DEFAULT_LOCK_MESSAGE,
                  enter_room_function=lambda: None,
-                 items_to_buy: 'Inventory[Item,int]' = DEFAULT_ITEMS_TO_BUY):
+                 items_to_buy: 'Inventory[Item,int]' = DEFAULT_ITEMS_TO_BUY,
+                 items_to_sell: 'Inventory[Item,int]' = DEFAULT_ITEMS_TO_SELL):
         self.name = name
         self.connected_rooms = list()
         self.npc: NPC = npc
@@ -36,6 +38,8 @@ class Room:
         self.locked: bool = locked
         self.lock_message: str = lock_message
         self.items_to_buy: 'Inventory[Item,int]' = items_to_buy if items_to_buy is not None else Inventory(
+        )
+        self.items_to_sell: 'Inventory[Item,int]' = items_to_sell if items_to_sell is not None else Inventory(
         )
 
     def __str__(self) -> str:
@@ -52,7 +56,8 @@ class Room:
             "respawn_point": self.respawn_point,
             "locked": self.locked,
             "lock_message": self.lock_message,
-            "items_to_buy": self.items_to_buy.to_json()
+            "items_to_buy": self.items_to_buy.to_json(),
+            "items_to_sell": self.items_to_sell.to_json()
         }
 
     @staticmethod
@@ -67,6 +72,7 @@ class Room:
         room.locked = json_object["locked"] if json_object["locked"] else DEFAULT_LOCK_MESSAGE
         room.lock_message = json_object["lock_message"] if json_object["lock_message"] else None
         room.items_to_buy = Inventory.from_json(json_object["items_to_buy"])
+        room.items_to_sell = Inventory.from_json(json_object["items_to_sell"])
 
     def enter_room(self):
         from main import CHARACTER
@@ -94,18 +100,34 @@ Attack {self.npc} by typing \"attack melee\" or \"attack ranged\""
             CHARACTER.respawn_point = self
             print("Your respawn point has been updated.")
         self.visited = True
-        if self.items_to_buy:
-            print(self.buy_menu(), sleep_time=0.0001)
+        if self.items_to_buy or self.items_to_sell:
+            print(self.shop_menu(), sleep_time=0.0001)
 
-    def buy_menu(self) -> str:
+    def buy_menu(self) -> 'list[str]':
         ret = []
-        ret.extend([
-            f"----- {self} shop -----",
-            f"{'Item':20}{'Price':10}"
-        ])
+        ret.append("Price".center(10)+"Item")
         for item, price in self.items_to_buy.items():
-            ret.append(f"{str(item):20}{price:10}")
-        ret.append("-"*int(17+len(self.name)))
+            ret.append(f"{str(price).center(10)}{str(item):20}")
+        return ret
+
+    def sell_menu(self) -> 'list[str]':
+        ret = []
+        ret.append("Returned Coins".center(18)+"Item")
+        for item, price in self.items_to_sell.items():
+            ret.append(f"{str(price).center(18)}{str(item):20}")
+        return ret
+
+    def shop_menu(self) -> str:
+        ret = []
+        if self.items_to_buy:
+            ret.append(f"----- {self} store -----")
+            ret.extend(self.buy_menu())
+            if not self.items_to_sell:
+                ret.append("-"*int(18+len(self.name)))
+        if self.items_to_sell:
+            ret.append(f"----- {self} buys these items -----")
+            ret.extend(self.sell_menu())
+            ret.append("-"*int(29+len(self.name)))
         return "\n".join(ret)
 
     def get_connected_rooms(self) -> 'list[Room]':

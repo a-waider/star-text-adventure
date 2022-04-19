@@ -90,7 +90,7 @@ def gravestone():
     print([
         "Why is there a gravestone in the front yard?",
         "Ledgends say that here lies the old guard, the savior from the zombie apocalypse.",
-        f"According to the ledgend his hideout is {Rooms.MOTEL_ONE.value.name}."
+        f"According to the ledgend his hideout is {Rooms.MOTEL_ONE.value}."
     ])
 
 
@@ -246,6 +246,9 @@ class Rooms(Enum):
             Items.ARMOR.value: 1,
             Items.BULLET_CARTRIDGE.value: 2,
             Items.HEALING_POTION.value: 5,
+        }),
+        items_to_sell=Inventory({
+            Items.MAP_HOME: 7
         }))
     GRAVESTONE: Room = Room(
         "Gravestone",
@@ -317,6 +320,12 @@ class Rooms(Enum):
             Items.BANANA.value: 4,
             Items.EGGPLANT.value: 7,
             Items.PRETZEL.value: 3
+        }),
+        items_to_sell=Inventory({
+            Items.APPLE.value: 1,
+            Items.BANANA.value: 3,
+            Items.EGGPLANT.value: 4,
+            Items.PRETZEL.value: 2
         }))
     CATHETRAL: Room = Room(
         name="Cathetral",
@@ -364,6 +373,9 @@ class Rooms(Enum):
         lock_message="The door to the Hairy barber store is still locked. But you can't find a key anywhere.",
         loot=Inventory({
             Items.COIN.value: 2
+        }),
+        items_to_sell=Inventory({
+            Items.PISTOL.value: 15
         }),
         enter_room_function=hairy_barber)
     BATHROOM: Room = Room(

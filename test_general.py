@@ -1,4 +1,5 @@
 from classes.inventory import Inventory
+from classes.item import Item
 from classes.npc import NPC
 from classes.person import MAX_LUCK
 from main import CHARACTER, main
@@ -102,25 +103,37 @@ class TestInventory(Test):
         assert Items.COIN.value in CHARACTER.room.loot
         assert CHARACTER.room.loot[Items.COIN.value] == items_to_drop
 
-    def test_buy_item(self):
+    def test_buy_item(self, item_to_buy: Item = Items.HEALING_POTION.value):
         CHARACTER.room = Rooms.GARAGE.value
-        CHARACTER.inventory.add_item(Items.COIN.value, 100)
+        CHARACTER.inventory.add_item(
+            Items.COIN.value, Rooms.GARAGE.value.items_to_buy[item_to_buy])
         execute_commands(commands=[
-            f"buy {Items.HEALING_POTION.value.name}"
+            f"buy {item_to_buy.name}"
         ])
-        assert Items.HEALING_POTION.value in CHARACTER.inventory
+        assert CHARACTER.inventory[item_to_buy] == 1
+        assert Items.COIN.value not in CHARACTER.inventory
 
-    def test_buy_multiple_items(self, items_to_buy: int = 5):
+    def test_buy_multiple_items(self, item_to_buy: Item = Items.HEALING_POTION.value, amount: int = 5):
         CHARACTER.room = Rooms.GARAGE.value
-        CHARACTER.inventory.add_item(Items.COIN.value, items_to_buy*100)
+        CHARACTER.inventory.add_item(
+            Items.COIN.value, amount*Rooms.GARAGE.value.items_to_buy[item_to_buy])
         execute_commands(commands=[
-            f"buy {Items.HEALING_POTION.value.name} {items_to_buy}"
+            f"buy {item_to_buy.name} {amount}"
         ])
-        assert CHARACTER.inventory[Items.HEALING_POTION.value] == items_to_buy
-        assert CHARACTER.inventory[Items.COIN.value] == items_to_buy*100 - \
-            items_to_buy * \
-            Rooms.GARAGE.value.items_to_buy[Items.HEALING_POTION.value]
-        assert Items.HEALING_POTION.value in CHARACTER.inventory
+        assert item_to_buy in CHARACTER.inventory
+        assert CHARACTER.inventory[item_to_buy] == amount
+        assert Items.COIN.value not in CHARACTER.inventory
+
+    def test_sell_item(self, item_to_sell: Item = Items.MAP_HOME.value):
+        CHARACTER.room = Rooms.GARAGE.value
+        CHARACTER.room.items_to_sell[item_to_sell] = 4
+        CHARACTER.inventory.add_item(item_to_sell)
+        execute_commands(commands=[
+            f"sell {item_to_sell.name}"
+        ])
+        print(CHARACTER.room.items_to_sell[item_to_sell])
+        assert item_to_sell not in CHARACTER.inventory
+        assert CHARACTER.inventory[Items.COIN.value] == CHARACTER.room.items_to_sell[item_to_sell]
 
     def test_equip_melee_weapon(self):
         CHARACTER.melee_weapon = Items.REMOTE.value

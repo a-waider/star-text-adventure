@@ -77,6 +77,31 @@ def buy(args: 'list[str]'):
         print("This item can't be bought.")
 
 
+def sell(args: 'list[str]'):
+    # TODO
+    from main import CHARACTER
+
+    from world.items import Items
+
+    try:
+        int(args[-1])
+        amount = int(args.pop())
+    except ValueError:
+        amount = 1
+    item = Items.get_item_by_name(" ".join(args))
+    if item in CHARACTER.room.items_to_sell:
+        returned_coins = CHARACTER.room.items_to_sell[item]
+        if item in CHARACTER.inventory and CHARACTER.inventory[item] <= amount:
+            CHARACTER.inventory.remove_item(item, amount)
+            CHARACTER.inventory.add_item(
+                Items.COIN.value, amount*returned_coins)
+        else:
+            print(
+                f"You don't have enough {item.__str__(amount=amount)} in your inventory.")
+    else:
+        print("This item can't be sold.")
+
+
 def take(args: 'list[str]'):
     from main import CHARACTER
 
@@ -383,6 +408,16 @@ class Commands(Enum):
             Rooms.REWE_TO_GO.value
         ],
         command=buy)
+    SELL: Command = Command(
+        "sell",
+        args=["item", "amount"],
+        description="Sells an item",
+        valid_rooms=[
+            Rooms.GARAGE.value,
+            Rooms.REWE_TO_GO.value,
+            Rooms.HAIRY_BARBER.value
+        ],
+        command=sell)
     TAKE: Command = Command(
         "take",
         args=["item"],
