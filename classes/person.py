@@ -62,7 +62,7 @@ class Person:
                        critical: bool = False) -> str:
         heart_icon, health_color = colored_health(self.health, self.max_health)
         health_lost_string: str = f"{prev_health} - {prev_health-self.health} \
-{'(critical attack)' if critical else ''} = " if prev_health and prev_health != self.health else ""
+{'(critical hit)' if critical else ''} = " if prev_health and prev_health != self.health else ""
         armor_damage_string: str = f"{prev_armor} - {round(prev_armor-self.armor,1)} \
 = " if prev_armor and prev_armor != self.armor else ""
         ret = f"""{'Health: ':15}{heart_icon} {health_lost_string}\
@@ -135,7 +135,6 @@ class Person:
         if self.armor == 0:
             self.health = max(self.health-damage, 0)
         else:
-            print()
             for _ in range(int(self.armor)):
                 damage *= 0.98
             self.health = max(self.health - int(damage), 0)

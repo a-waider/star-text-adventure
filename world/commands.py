@@ -288,24 +288,31 @@ def attack(args: 'list[str]'):
         npc_prev_armor = npc.armor
         if not character_attack_damage:
             return
+        max_name_length = max(len(npc.name), len(CHARACTER.name))
         if CHARACTER.luck > random.randint(0, MAX_LUCK):
-            print("You are lucky you can start attacking.")
+            print("You are lucky you can start attacking.\n")
             npc.defend(character_attack_damage)
             if npc.health > 0:
                 CHARACTER.defend(npc_attack_damage)
+            print(f"----- {str(npc).center(max_name_length)} -----")
+            print(npc.fighting_stats(
+                prev_health=npc_prev_health, prev_armor=npc_prev_armor, weapon=weapon))
+            print(f"----- {str(CHARACTER).center(max_name_length)} -----")
+            print(CHARACTER.fighting_stats(
+                prev_health=character_prev_health, prev_armor=character_prev_armor, critical=npc_attack_critical))
+            print("-"*int(12+max_name_length))
         else:
-            print(f"{npc} starts attacking.")
+            print(f"{npc} starts attacking.\n")
             CHARACTER.defend(npc_attack_damage)
             if CHARACTER.health > 0:
                 npc.defend(character_attack_damage)
-        max_name_length = max(len(npc.name), len(CHARACTER.name))
-        print(f"----- {str(npc).center(max_name_length)} -----")
-        print(npc.fighting_stats(
-            prev_health=npc_prev_health, prev_armor=npc_prev_armor, weapon=weapon))
-        print(f"----- {str(CHARACTER).center(max_name_length)} -----")
-        print(CHARACTER.fighting_stats(
-            prev_health=character_prev_health, prev_armor=character_prev_armor, critical=npc_attack_critical))
-        print("-"*int(12+max_name_length))
+            print(f"----- {str(CHARACTER).center(max_name_length)} -----")
+            print(CHARACTER.fighting_stats(
+                prev_health=character_prev_health, prev_armor=character_prev_armor, critical=npc_attack_critical))
+            print(f"----- {str(npc).center(max_name_length)} -----")
+            print(npc.fighting_stats(
+                prev_health=npc_prev_health, prev_armor=npc_prev_armor, weapon=weapon))
+            print("-"*int(12+max_name_length))
         if CHARACTER.health <= 0:
             CHARACTER.deaths += 1
             CHARACTER.health = 100
