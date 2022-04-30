@@ -76,6 +76,7 @@ class Room:
 
     def enter_room(self):
         from main import CHARACTER
+        from world.items import Items
 
         if self.locked and self.lock_message:
             print(f"{self.lock_message}\n")
@@ -83,8 +84,8 @@ class Room:
         if self.npc:
             if CHARACTER.kills == 0:
                 print([
-                    f"You approach your first enemy. \
-Attack {self.npc} by typing \"attack melee\" or \"attack ranged\"."
+                    f"You approach your first enemy. Your only weapon is the {Items.REMOTE.value}.",
+                    f"Attack {self.npc} by typing \"attack melee\" or \"attack ranged\"."
                 ])
             max_name_length = max(len(self.npc.name), len(CHARACTER.name))
             print(f"----- {str(self.npc).center(max_name_length)} -----")
