@@ -80,7 +80,7 @@ class NPC:
             self.health = max(self.health-damage, 0)
         else:
             self.health = max(self.health-int(damage / self.armor * 10), 0)
-        self.armor = max(self.armor - damage*0.25, 0)
+        self.armor = round(max(self.armor - damage*0.25, 0), 1)
         if self.health <= 0:
             CHARACTER.kills += 1
             print(f"You defeated {self}.")

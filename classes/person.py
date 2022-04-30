@@ -53,7 +53,7 @@ class Person:
     def stats(self, ammunition: bool = False, prev_health: int = None, prev_armor: int = None):
         return f"""{self.fighting_stats(ammunition=ammunition, prev_health=prev_health, prev_armor=prev_armor)}
 {'Cures: ':15}💉 {self.cures}
-{'Luck: ':15}   {self.luck}"""
+{'Luck: ':15}🍀 {self.luck}"""
 
     def fighting_stats(self,
                        ammunition: bool = False,
@@ -133,13 +133,13 @@ class Person:
 
     def defend(self, damage: int):
         if self.armor == 0:
-            self.health -= damage
+            self.health = max(self.health-damage, 0)
         else:
             print()
             for _ in range(int(self.armor)):
                 damage *= 0.98
             self.health = max(self.health - int(damage), 0)
-        self.armor = max(self.armor - int(damage)*0.18, 0)
+        self.armor = round(max(self.armor - int(damage)*0.18, 0), 1)
 
     def add_health(self, health_points: int):
         self.health = min(self.health+health_points, self.max_health)

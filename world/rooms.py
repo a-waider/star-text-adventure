@@ -248,7 +248,7 @@ class Rooms(Enum):
             Items.HEALING_POTION.value: 5,
         }),
         items_to_sell=Inventory({
-            Items.MAP_HOME: 7
+            Items.MAP_HOME.value: 7
         }))
     GRAVESTONE: Room = Room(
         "Gravestone",
