@@ -311,7 +311,7 @@ def attack(args: 'list[str]'):
             CHARACTER.health = 100
             CHARACTER.room = CHARACTER.respawn_point
             print(
-                f"You have been killed by {npc} and respawn in {CHARACTER.room}")
+                f"You have been killed by {npc} and respawn in {CHARACTER.room}.")
         if not CHARACTER.room.npc:
             CHARACTER.room.enter_room()
     else:

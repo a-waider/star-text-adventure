@@ -84,7 +84,7 @@ class Room:
             if CHARACTER.kills == 0:
                 print([
                     f"You approach your first enemy. \
-Attack {self.npc} by typing \"attack melee\" or \"attack ranged\""
+Attack {self.npc} by typing \"attack melee\" or \"attack ranged\"."
                 ])
             max_name_length = max(len(self.npc.name), len(CHARACTER.name))
             print(f"----- {str(self.npc).center(max_name_length)} -----")
