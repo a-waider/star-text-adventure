@@ -32,7 +32,7 @@ class NPC:
         self.base_damage: int = base_damage
         self.krit_damage: int = krit_damage
         self.krit_chance: float = krit_chance
-        self.armor: int = armor
+        self.armor: float = armor
         self.loot: 'Inventory[Item,int]' = loot if loot is not None else Inventory(
         )
 
@@ -91,7 +91,7 @@ class NPC:
     def fighting_stats(self, prev_health: int = None, prev_armor: int = None, weapon: Weapon = None) -> str:
         heart_icon, health_color = colored_health(self.health, self.max_health)
         health_lost_string: str = f"{prev_health} - {prev_health-self.health}  ({weapon}) = " if prev_health else ""
-        armor_damage_string: str = f"{prev_armor} - {prev_armor-self.armor} = " if prev_armor else ""
+        armor_damage_string: str = f"{prev_armor} - {round(prev_armor-self.armor,1)} = " if prev_armor else ""
         return f"""{'Health: ':15}{heart_icon} {health_lost_string}\
 {colored(f'{self.health} / {self.max_health}', health_color)}
 {'Armor: ':15}🛡  {armor_damage_string}{colored(self.armor, 'blue')}"""

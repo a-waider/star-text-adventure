@@ -34,7 +34,7 @@ class Person:
         self.health: int = health
         self.max_health: int = max_health
         self.luck: int = luck
-        self.armor: int = armor
+        self.armor: float = armor
         self.melee_weapon: WeaponMelee = melee_weapon
         self.ranged_weapon: WeaponRanged = ranged_weapon
         self.inventory: 'Inventory[Item,int]' = inventory if inventory is not None else Inventory(
@@ -63,7 +63,7 @@ class Person:
         heart_icon, health_color = colored_health(self.health, self.max_health)
         health_lost_string: str = f"{prev_health} - {prev_health-self.health} \
 {'(critical attack)' if critical else ''} = " if prev_health and prev_health != self.health else ""
-        armor_damage_string: str = f"{prev_armor} - {prev_armor-self.armor} \
+        armor_damage_string: str = f"{prev_armor} - {round(prev_armor-self.armor,1)} \
 = " if prev_armor and prev_armor != self.armor else ""
         ret = f"""{'Health: ':15}{heart_icon} {health_lost_string}\
 {colored(f'{max(self.health,0)} / {self.max_health}', health_color)}
